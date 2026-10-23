@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI读源码 · 目录</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ECEEE7;
+    --ink: #23281F;
+    --muted: #6E7566;
+    --faint: #A9AF9E;
+    --guide: #C4C9B8;
+    --line: #D3D7C9;
+    --hover: #F1F3EA;
+    --accent: #2B4C7E;
+    --serif: "Songti SC", "STSong", "SimSun", Georgia, serif;
+    --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 44px 28px 72px;
+  }
+
+  /* ---------- header ---------- */
+  .path {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--faint);
+    margin: 0 0 18px;
+    letter-spacing: 0.01em;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 0 0 10px;
+    letter-spacing: 0.03em;
+  }
+  .lede {
+    max-width: 34em;
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 22px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 32px;
+    margin: 0 0 40px;
+    padding: 0;
+    list-style: none;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .meta .num { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+  .meta .branch { font-family: var(--mono); font-size: 11.5px; }
+
+  /* ---------- tree ---------- */
+  .panel {
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 14px;
+    margin-bottom: 46px;
+  }
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0 8px;
+  }
+  .panel-head h2, .timeline h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .panel-head .hint {
+    font-size: 12px;
+    color: var(--faint);
+  }
+
+  .root-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 10px 8px 30px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .root-row .root-desc {
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--faint);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    column-gap: 12px;
+    align-items: baseline;
+    width: 100%;
+    padding: 0 10px;
+    border: none;
+    background: none;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    border-radius: 0;
+    cursor: default;
+    transition: background-color 120ms ease;
+  }
+  div.row:hover { background: var(--hover); }
+  .row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  /* guide cells: lines drawn with borders, one segment per row so they join seamlessly */
+  .pre {
+    position: relative;
+    align-self: stretch;
+    grid-row: 1 / span 2;
+    min-height: 31px;
+  }
+  .g {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    border-left: 1px solid var(--guide);
+  }
+  .g.elbow::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -1px;
+    width: 13px;
+    border-top: 1px solid var(--guide);
+  }
+  .g.last {
+    height: 50%;
+    bottom: auto;
+    border-left: 1px solid var(--guide);
+  }
+  .g.last::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    width: 13px;
+    border-top: 1px solid var(--guide);
+  }
+
+  .name {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 5px 0;
+    white-space: nowrap;
+  }
+  .desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    padding: 5px 0;
+  }
+  .wk {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+    white-space: nowrap;
+    text-align: right;
+    padding: 5px 0;
+  }
+  .chip-empty {
+    display: inline-block;
+    padding: 0 7px;
+    border: 1px dashed var(--faint);
+    color: var(--faint);
+    font-size: 10.5px;
+    line-height: 1.6;
+  }
+
+  button.folder {
+    cursor: pointer;
+  }
+  button.folder:hover { background: var(--hover); }
+  button.folder .name { font-weight: 700; }
+  .chev {
+    display: inline-block;
+    width: 1em;
+    margin-right: 3px;
+    color: var(--faint);
+    transition: transform 130ms ease;
+    transform: rotate(90deg);
+  }
+  button.folder.collapsed .chev { transform: rotate(0deg); }
+  [hidden] { display: none !important; }
+
+  /* ---------- timeline ---------- */
+  .timeline { margin-bottom: 44px; }
+  .timeline h2 { margin-bottom: 14px; }
+  .bar {
+    display: flex;
+    gap: 2px;
+    height: 40px;
+  }
+  .seg { min-width: 0; }
+  .seg-0 { flex: 3;   background: #1E3A63; }
+  .seg-1 { flex: 3;   background: #27466F; }
+  .seg-2 { flex: 5;   background: #31527D; }
+  .seg-3 { flex: 5.5; background: #3D5E8C; }
+  .seg-4 { flex: 1.5; background: #4A6793; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 26px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .legend li {
+    flex: 1 1 130px;
+    min-width: 118px;
+    display: grid;
+    grid-template-columns: 10px 1fr;
+    column-gap: 8px;
+    align-items: start;
+    line-height: 1.5;
+  }
+  .legend .dot {
+    width: 10px;
+    height: 10px;
+    margin-top: 5px;
+  }
+  .legend .lg-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    display: block;
+  }
+  .legend .lg-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    display: block;
+  }
+
+  .pull {
+    margin: 20px 0 0;
+    padding-left: 16px;
+    border-left: 2px solid var(--accent);
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    font-size: 11.5px;
+    color: var(--faint);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 640px) {
+    .sheet { padding: 32px 18px 56px; }
+    h1 { font-size: 30px; }
+    .row {
+      grid-template-columns: auto auto 1fr;
+    }
+    .desc {
+      grid-column: 2 / 4;
+      grid-row: 2;
+      padding-top: 0;
+    }
+    .wk { grid-row: 1; justify-self: end; }
+    .name { white-space: normal; word-break: break-all; }
+    .panel-head .hint { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chev { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+
+  <header>
+    <p class="path">D:\hy\读书笔记\AI读源码</p>
+    <h1>AI读源码</h1>
+    <p class="lede">用 AI 把读开源项目变成一条可执行、可验证、能回填工作的流水线，而不是让 AI 替你概括仓库。</p>
+    <ul class="meta">
+      <li><span class="num">12</span> 个文件</li>
+      <li><span class="num">4</span> 个子目录</li>
+      <li>git 分支 <span class="branch">codex/ai-source-learning</span></li>
+    </ul>
+  </header>
+
+  <section class="panel" aria-label="目录树">
+    <div class="panel-head">
+      <h2>目录</h2>
+      <p class="hint">点击文件夹可折叠</p>
+    </div>
+
+    <div class="root-row" role="tree" aria-label="AI读源码 目录树">
+      <span>AI读源码/</span>
+      <span class="root-desc">方法论 · 路线图 · 问题清单 · 笔记</span>
+    </div>
+
+    <div role="group">
+      <div class="row" role="treeitem">
+        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
+        <span class="name">README.md</span>
+        <span class="desc">目标、三条原则与最小启动动作</span>
+        <span class="wk">—</span>
+      </div>
+
+      <button class="row folder" type="button" aria-expanded="true" data-folder="f1">
+        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
+        <span class="name"><span class="chev">▸</span>01-方法论/</span>
+        <span class="desc">先通读一遍，之后每月回看</span>
+        <span class="wk">3 篇</span>
+      </button>
+      <div role="group">
+        <div class="row" role="treeitem" data-parent="f1">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">AI辅助读源码方法论.md</span>
+          <span class="desc">完整阅读流程与环境准备</span>
+          <span class="wk">—</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f1">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">提示词库.md</span>
+          <span class="desc">每次开新阅读会话从这里复制提示词</span>
+          <span class="wk">—</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f1">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g last" style="left:20px"></i></span>
+          <span class="name">笔记模板.md</span>
+          <span class="desc">读完一条链路后按模板成文</span>
+          <span class="wk">—</span>
+        </div>
+      </div>
+
+      <button class="row folder" type="button" aria-expanded="true" data-folder="f2">
+        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
+        <span class="name"><span class="chev">▸</span>02-路线图/</span>
+        <span class="desc">决定这周读哪个项目、读到哪一步</span>
+        <span class="wk">6 篇</span>
+      </button>
+      <div role="group">
+        <div class="row" role="treeitem" data-parent="f2">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">00-总路线图.md</span>
+          <span class="desc">五个阶段、17 周排期与硬性完成标准</span>
+          <span class="wk">W1–17</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f2">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">00-前置-LangChain-LangGraph巩固路线.md</span>
+          <span class="desc">主动回忆加抽象层源码，产出 mini_chain / mini_graph</span>
+          <span class="wk">W1–3</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f2">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">01-Datus源码阅读路线.md</span>
+          <span class="desc">看真实产品怎么把 Agent 工程化</span>
+          <span class="wk">W4–6</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f2">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">02-Paimon源码阅读路线.md</span>
+          <span class="desc">湖仓底座：数据模型、commit 与 snapshot</span>
+          <span class="wk">W7–11</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f2">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
+          <span class="name">03-Flink源码阅读路线.md</span>
+          <span class="desc">分布式运行时：提交、执行、checkpoint</span>
+          <span class="wk">W12–16</span>
+        </div>
+        <div class="row" role="treeitem" data-parent="f2">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g last" style="left:20px"></i></span>
+          <span class="name">04-Spark源码阅读路线.md</span>
+          <span class="desc">看懂一条 SQL 的一生，够用即可</span>
+          <span class="wk">W17</span>
+        </div>
+      </div>
+
+      <button class="row folder" type="button" aria-expanded="true" data-folder="f3">
+        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
+        <span class="name"><span class="chev">▸</span>03-问题清单/</span>
+        <span class="desc">问题驱动的阅读入口</span>
+        <span class="wk">1 篇</span>
+      </button>
+      <div role="group">
+        <div class="row" role="treeitem" data-parent="f3">
+          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g last" style="left:20px"></i></span>
+          <span class="name">工作问题backlog.md</span>
+          <span class="desc">每周挑一个真实问题作为阅读入口</span>
+          <span class="wk">—</span>
+        </div>
+      </div>
+
+      <button class="row folder" type="button" aria-expanded="true" data-folder="f4">
+        <span class="pre" style="width:20px"><i class="g last" style="left:0"></i></span>
+        <span class="name"><span class="chev">▸</span>04-笔记/</span>
+        <span class="desc">成文的阅读笔记，一篇一个主题</span>
+        <span class="wk">1 篇</span>
+      </button>
+      <div role="group">
+        <div class="row" role="treeitem" data-parent="f4">
+          <span class="pre" style="width:40px"><i class="g last" style="left:20px"></i></span>
+          <span class="name">README.md</span>
+          <span class="desc">笔记索引，还没有成文笔记</span>
+          <span class="wk"><span class="chip-empty">空</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="timeline" aria-label="17 周主线">
+    <h2>17 周主线</h2>
+    <div class="bar">
+      <div class="seg seg-0"></div>
+      <div class="seg seg-1"></div>
+      <div class="seg seg-2"></div>
+      <div class="seg seg-3"></div>
+      <div class="seg seg-4"></div>
+    </div>
+    <ul class="legend">
+      <li>
+        <span class="dot" style="background:#1E3A63"></span>
+        <span><span class="lg-name">LangChain / LangGraph</span><span class="lg-sub">阶段 0，3 周</span></span>
+      </li>
+      <li>
+        <span class="dot" style="background:#27466F"></span>
+        <span><span class="lg-name">Datus</span><span class="lg-sub">阶段 1，3 周</span></span>
+      </li>
+      <li>
+        <span class="dot" style="background:#31527D"></span>
+        <span><span class="lg-name">Paimon</span><span class="lg-sub">阶段 2，5 周</span></span>
+      </li>
+      <li>
+        <span class="dot" style="background:#3D5E8C"></span>
+        <span><span class="lg-name">Flink</span><span class="lg-sub">阶段 3，5–6 周</span></span>
+      </li>
+      <li>
+        <span class="dot" style="background:#4A6793"></span>
+        <span><span class="lg-name">Spark</span><span class="lg-sub">阶段 4，1–2 周</span></span>
+      </li>
+    </ul>
+    <p class="pull">前 3 周不是热身，是补地基：LangGraph 没读懂就读 Datus，只能看个热闹。</p>
+  </section>
+
+  <footer>
+    静态快照，2026-10-23。新增或删除文件后，让我重新生成即可。.git/ 未展示。
+  </footer>
+
+</main>
+
+<script>
+  document.querySelectorAll('button.folder').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-folder');
+      var collapsed = btn.classList.toggle('collapsed');
+      btn.setAttribute('aria-expanded', String(!collapsed));
+      document.querySelectorAll('[data-parent="' + id + '"]').forEach(function (child) {
+        child.hidden = collapsed;
+      });
+    });
+  });
+</script>
+</body>
+</html>
