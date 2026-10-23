@@ -3,494 +3,1976 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI读源码 · 目录</title>
+<title>AI读源码 · 阅读器</title>
 <style>
   :root {
     color-scheme: light;
-    --bg: #ECEEE7;
+    --bg: #E9ECE3;
+    --side: #E3E7DB;
+    --paper: #F7F8F3;
     --ink: #23281F;
     --muted: #6E7566;
-    --faint: #A9AF9E;
-    --guide: #C4C9B8;
-    --line: #D3D7C9;
-    --hover: #F1F3EA;
+    --faint: #A0A794;
+    --line: #D6D9CC;
+    --hover: #EFF1E8;
     --accent: #2B4C7E;
+    --accent-soft: #E2E8F1;
     --serif: "Songti SC", "STSong", "SimSun", Georgia, serif;
     --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
     --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
+  html, body { margin: 0; height: 100%; }
   body {
-    background: var(--bg);
-    color: var(--ink);
     font-family: var(--sans);
     font-size: 14px;
     line-height: 1.7;
+    color: var(--ink);
+    background: var(--bg);
     -webkit-font-smoothing: antialiased;
   }
-  .sheet {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 44px 28px 72px;
-  }
-
-  /* ---------- header ---------- */
-  .path {
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--faint);
-    margin: 0 0 18px;
-    letter-spacing: 0.01em;
-  }
-  h1 {
-    font-family: var(--serif);
-    font-size: 40px;
-    font-weight: 600;
-    line-height: 1.25;
-    margin: 0 0 10px;
-    letter-spacing: 0.03em;
-  }
-  .lede {
-    max-width: 34em;
-    font-size: 14px;
-    color: var(--muted);
-    margin: 0 0 22px;
-  }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 32px;
-    margin: 0 0 40px;
-    padding: 0;
-    list-style: none;
-    font-size: 12.5px;
-    color: var(--muted);
-  }
-  .meta .num { font-family: var(--mono); font-size: 13px; color: var(--ink); }
-  .meta .branch { font-family: var(--mono); font-size: 11.5px; }
-
-  /* ---------- tree ---------- */
-  .panel {
-    border-top: 2px solid var(--ink);
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 14px;
-    margin-bottom: 46px;
-  }
-  .panel-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 0 8px;
-  }
-  .panel-head h2, .timeline h2 {
-    font-family: var(--serif);
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
-    letter-spacing: 0.02em;
-  }
-  .panel-head .hint {
-    font-size: 12px;
-    color: var(--faint);
-  }
-
-  .root-row {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 8px 10px 8px 30px;
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 700;
-  }
-  .root-row .root-desc {
-    font-family: var(--sans);
-    font-weight: 400;
-    font-size: 12px;
-    color: var(--faint);
-  }
-
-  .row {
+  .app {
     display: grid;
-    grid-template-columns: auto auto 1fr auto;
-    column-gap: 12px;
-    align-items: baseline;
-    width: 100%;
-    padding: 0 10px;
-    border: none;
-    background: none;
-    text-align: left;
-    font: inherit;
-    color: inherit;
-    border-radius: 0;
-    cursor: default;
-    transition: background-color 120ms ease;
+    grid-template-columns: 268px 1fr;
+    height: 100vh;
+    height: 100dvh;
   }
-  div.row:hover { background: var(--hover); }
-  .row:focus-visible {
+
+  /* ---------- sidebar ---------- */
+  .side {
+    background: var(--side);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 26px 14px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-path {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--faint);
+    margin: 0 0 10px;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+  .brand h1 {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin: 0 0 18px;
+  }
+  .group-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--faint);
+    margin: 16px 0 5px;
+    padding: 0 8px;
+  }
+  .sitem {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+    padding: 5px 8px;
+    border: none;
+    border-left: 2px solid transparent;
+    background: none;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    line-height: 1.55;
+  }
+  .sitem .nm {
+    font-family: var(--mono);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sitem .wk {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+  .sitem:hover { background: var(--hover); }
+  .sitem.active {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+  }
+  .sitem:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: -2px;
   }
+  .side-foot {
+    margin-top: auto;
+    padding: 16px 8px 0;
+    font-size: 10.5px;
+    color: var(--faint);
+    line-height: 1.7;
+    border-top: 1px solid var(--line);
+  }
 
-  /* guide cells: lines drawn with borders, one segment per row so they join seamlessly */
-  .pre {
+  /* ---------- main ---------- */
+  .main {
     position: relative;
-    align-self: stretch;
-    grid-row: 1 / span 2;
-    min-height: 31px;
+    overflow-y: auto;
+    background: var(--paper);
   }
-  .g {
-    position: absolute;
+  .topbar {
+    position: sticky;
     top: 0;
-    bottom: 0;
-    width: 20px;
-    border-left: 1px solid var(--guide);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 24px;
+    background: rgba(247, 248, 243, 0.94);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(4px);
   }
-  .g.elbow::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: -1px;
-    width: 13px;
-    border-top: 1px solid var(--guide);
-  }
-  .g.last {
-    height: 50%;
-    bottom: auto;
-    border-left: 1px solid var(--guide);
-  }
-  .g.last::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: -1px;
-    width: 13px;
-    border-top: 1px solid var(--guide);
-  }
-
-  .name {
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.6;
-    padding: 5px 0;
-    white-space: nowrap;
-  }
-  .desc {
-    font-size: 12.5px;
-    color: var(--muted);
-    padding: 5px 0;
-  }
-  .wk {
+  .topbar-path {
+    flex: 1;
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--faint);
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: right;
-    padding: 5px 0;
   }
-  .chip-empty {
-    display: inline-block;
-    padding: 0 7px;
-    border: 1px dashed var(--faint);
-    color: var(--faint);
-    font-size: 10.5px;
-    line-height: 1.6;
+  .ext {
+    font-size: 11.5px;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
   }
-
-  button.folder {
+  .ext:hover { text-decoration: underline; }
+  .ext:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nav-toggle {
+    display: none;
+    font: inherit;
+    font-size: 12px;
+    color: var(--ink);
+    background: none;
+    border: 1px solid var(--line);
+    padding: 3px 10px;
     cursor: pointer;
   }
-  button.folder:hover { background: var(--hover); }
-  button.folder .name { font-weight: 700; }
-  .chev {
-    display: inline-block;
-    width: 1em;
-    margin-right: 3px;
-    color: var(--faint);
-    transition: transform 130ms ease;
-    transform: rotate(90deg);
-  }
-  button.folder.collapsed .chev { transform: rotate(0deg); }
-  [hidden] { display: none !important; }
 
-  /* ---------- timeline ---------- */
-  .timeline { margin-bottom: 44px; }
-  .timeline h2 { margin-bottom: 14px; }
-  .bar {
-    display: flex;
-    gap: 2px;
-    height: 40px;
+  /* ---------- document ---------- */
+  .doc {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 38px 44px 36px;
   }
-  .seg { min-width: 0; }
-  .seg-0 { flex: 3;   background: #1E3A63; }
-  .seg-1 { flex: 3;   background: #27466F; }
-  .seg-2 { flex: 5;   background: #31527D; }
-  .seg-3 { flex: 5.5; background: #3D5E8C; }
-  .seg-4 { flex: 1.5; background: #4A6793; }
-
-  .legend {
+  .doc h1 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    margin: 0 0 10px;
+  }
+  .doc-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px 26px;
-    margin: 14px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .legend li {
-    flex: 1 1 130px;
-    min-width: 118px;
-    display: grid;
-    grid-template-columns: 10px 1fr;
-    column-gap: 8px;
-    align-items: start;
-    line-height: 1.5;
-  }
-  .legend .dot {
-    width: 10px;
-    height: 10px;
-    margin-top: 5px;
-  }
-  .legend .lg-name {
-    font-size: 12.5px;
-    font-weight: 600;
-    display: block;
-  }
-  .legend .lg-sub {
-    font-size: 11px;
-    color: var(--muted);
+    gap: 4px 16px;
+    margin: 0 0 28px;
     font-family: var(--mono);
-    display: block;
-  }
-
-  .pull {
-    margin: 20px 0 0;
-    padding-left: 16px;
-    border-left: 2px solid var(--accent);
-    font-family: var(--serif);
-    font-size: 15px;
-    line-height: 1.8;
-    color: var(--ink);
-  }
-
-  footer {
-    border-top: 1px solid var(--line);
-    padding-top: 14px;
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--faint);
-    line-height: 1.8;
+  }
+  .doc-meta .weeks { color: var(--accent); }
+
+  .doc h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    margin: 34px 0 10px;
+    letter-spacing: 0.02em;
+  }
+  .doc h3 {
+    font-size: 15.5px;
+    font-weight: 700;
+    margin: 26px 0 8px;
+  }
+  .doc h4 { font-size: 14px; font-weight: 700; margin: 20px 0 6px; }
+  .doc p { margin: 12px 0; line-height: 1.95; }
+  .doc ul, .doc ol { margin: 10px 0; padding-left: 24px; }
+  .doc li { margin: 5px 0; line-height: 1.85; }
+  .doc li > ul, .doc li > ol { margin: 4px 0; }
+  .doc strong { font-weight: 700; }
+  .doc a { color: var(--accent); }
+  .doc code {
+    font-family: var(--mono);
+    font-size: 12.3px;
+    background: #E8EBDF;
+    padding: 1px 5px;
+    word-break: break-word;
+  }
+  .doc pre {
+    background: #242920;
+    color: #E9EBDF;
+    padding: 14px 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+    line-height: 1.75;
+  }
+  .doc pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 12.2px;
+    white-space: pre;
+  }
+  .doc blockquote {
+    margin: 16px 0;
+    padding: 2px 0 2px 16px;
+    border-left: 2px solid var(--accent);
+    color: #59604F;
+  }
+  .doc blockquote p { margin: 6px 0; }
+  .doc hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 26px 0;
+  }
+  .tw { overflow-x: auto; margin: 16px 0; }
+  .doc table {
+    border-collapse: collapse;
+    font-size: 12.8px;
+    min-width: 60%;
+  }
+  .doc th, .doc td {
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.65;
+  }
+  .doc th { background: #EDEFE5; font-weight: 600; white-space: nowrap; }
+  .doc td code { font-size: 11.8px; }
+  .chk {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #99A08D;
+    margin-right: 7px;
+    vertical-align: -1px;
   }
 
-  @media (max-width: 640px) {
-    .sheet { padding: 32px 18px 56px; }
-    h1 { font-size: 30px; }
-    .row {
-      grid-template-columns: auto auto 1fr;
+  .pager {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 44px 56px;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .pager button {
+    font: inherit;
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--line);
+    padding: 7px 12px;
+    cursor: pointer;
+    max-width: 48%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .pager button:hover { border-color: var(--accent); color: var(--accent); }
+  .pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .pager button:disabled { visibility: hidden; }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 33, 25, 0.28);
+    z-index: 15;
+  }
+
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; }
+    .side {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 282px;
+      z-index: 20;
+      transform: translateX(-100%);
+      transition: transform 160ms ease;
     }
-    .desc {
-      grid-column: 2 / 4;
-      grid-row: 2;
-      padding-top: 0;
-    }
-    .wk { grid-row: 1; justify-self: end; }
-    .name { white-space: normal; word-break: break-all; }
-    .panel-head .hint { display: none; }
+    .side.open { transform: none; }
+    .overlay.show { display: block; }
+    .nav-toggle { display: inline-block; }
+    .doc { padding: 26px 20px 30px; }
+    .pager { padding: 0 20px 44px; }
+    .topbar { padding: 9px 14px; gap: 10px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .chev { transition: none; }
+    .side { transition: none; }
   }
 </style>
 </head>
 <body>
-<main class="sheet">
+<div class="app">
 
-  <header>
-    <p class="path">D:\hy\读书笔记\AI读源码</p>
-    <h1>AI读源码</h1>
-    <p class="lede">用 AI 把读开源项目变成一条可执行、可验证、能回填工作的流水线，而不是让 AI 替你概括仓库。</p>
-    <ul class="meta">
-      <li><span class="num">12</span> 个文件</li>
-      <li><span class="num">4</span> 个子目录</li>
-      <li>git 分支 <span class="branch">codex/ai-source-learning</span></li>
-    </ul>
-  </header>
-
-  <section class="panel" aria-label="目录树">
-    <div class="panel-head">
-      <h2>目录</h2>
-      <p class="hint">点击文件夹可折叠</p>
+  <aside class="side" id="side">
+    <div class="brand">
+      <p class="brand-path">D:\hy\读书笔记\AI读源码</p>
+      <h1>AI读源码</h1>
     </div>
 
-    <div class="root-row" role="tree" aria-label="AI读源码 目录树">
-      <span>AI读源码/</span>
-      <span class="root-desc">方法论 · 路线图 · 问题清单 · 笔记</span>
+    <nav aria-label="文档目录">
+      <p class="group-label">总览</p>
+      <button class="sitem" data-doc="README.md"><span class="nm">README</span></button>
+
+      <p class="group-label">01-方法论</p>
+      <button class="sitem" data-doc="01-方法论/AI辅助读源码方法论.md"><span class="nm">AI辅助读源码方法论</span></button>
+      <button class="sitem" data-doc="01-方法论/提示词库.md"><span class="nm">提示词库</span></button>
+      <button class="sitem" data-doc="01-方法论/笔记模板.md"><span class="nm">笔记模板</span></button>
+
+      <p class="group-label">02-路线图</p>
+      <button class="sitem" data-doc="02-路线图/00-总路线图.md"><span class="nm">00-总路线图</span><span class="wk">W1–17</span></button>
+      <button class="sitem" data-doc="02-路线图/00-前置-LangChain-LangGraph巩固路线.md"><span class="nm">00-前置-LangChain-LangGraph</span><span class="wk">W1–3</span></button>
+      <button class="sitem" data-doc="02-路线图/01-Datus源码阅读路线.md"><span class="nm">01-Datus</span><span class="wk">W4–6</span></button>
+      <button class="sitem" data-doc="02-路线图/02-Paimon源码阅读路线.md"><span class="nm">02-Paimon</span><span class="wk">W7–11</span></button>
+      <button class="sitem" data-doc="02-路线图/03-Flink源码阅读路线.md"><span class="nm">03-Flink</span><span class="wk">W12–16</span></button>
+      <button class="sitem" data-doc="02-路线图/04-Spark源码阅读路线.md"><span class="nm">04-Spark</span><span class="wk">W17</span></button>
+
+      <p class="group-label">03-问题清单</p>
+      <button class="sitem" data-doc="03-问题清单/工作问题backlog.md"><span class="nm">工作问题backlog</span></button>
+
+      <p class="group-label">04-笔记</p>
+      <button class="sitem" data-doc="04-笔记/README.md"><span class="nm">README（空）</span></button>
+    </nav>
+
+    <div class="side-foot">
+      12 篇文档，内容已内嵌。<br>
+      改动 Markdown 后需重新生成。<br>
+      快照：2026-10-23
     </div>
+  </aside>
 
-    <div role="group">
-      <div class="row" role="treeitem">
-        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
-        <span class="name">README.md</span>
-        <span class="desc">目标、三条原则与最小启动动作</span>
-        <span class="wk">—</span>
-      </div>
+  <div class="overlay" id="overlay"></div>
 
-      <button class="row folder" type="button" aria-expanded="true" data-folder="f1">
-        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
-        <span class="name"><span class="chev">▸</span>01-方法论/</span>
-        <span class="desc">先通读一遍，之后每月回看</span>
-        <span class="wk">3 篇</span>
-      </button>
-      <div role="group">
-        <div class="row" role="treeitem" data-parent="f1">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">AI辅助读源码方法论.md</span>
-          <span class="desc">完整阅读流程与环境准备</span>
-          <span class="wk">—</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f1">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">提示词库.md</span>
-          <span class="desc">每次开新阅读会话从这里复制提示词</span>
-          <span class="wk">—</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f1">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g last" style="left:20px"></i></span>
-          <span class="name">笔记模板.md</span>
-          <span class="desc">读完一条链路后按模板成文</span>
-          <span class="wk">—</span>
-        </div>
-      </div>
-
-      <button class="row folder" type="button" aria-expanded="true" data-folder="f2">
-        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
-        <span class="name"><span class="chev">▸</span>02-路线图/</span>
-        <span class="desc">决定这周读哪个项目、读到哪一步</span>
-        <span class="wk">6 篇</span>
-      </button>
-      <div role="group">
-        <div class="row" role="treeitem" data-parent="f2">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">00-总路线图.md</span>
-          <span class="desc">五个阶段、17 周排期与硬性完成标准</span>
-          <span class="wk">W1–17</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f2">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">00-前置-LangChain-LangGraph巩固路线.md</span>
-          <span class="desc">主动回忆加抽象层源码，产出 mini_chain / mini_graph</span>
-          <span class="wk">W1–3</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f2">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">01-Datus源码阅读路线.md</span>
-          <span class="desc">看真实产品怎么把 Agent 工程化</span>
-          <span class="wk">W4–6</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f2">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">02-Paimon源码阅读路线.md</span>
-          <span class="desc">湖仓底座：数据模型、commit 与 snapshot</span>
-          <span class="wk">W7–11</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f2">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g elbow" style="left:20px"></i></span>
-          <span class="name">03-Flink源码阅读路线.md</span>
-          <span class="desc">分布式运行时：提交、执行、checkpoint</span>
-          <span class="wk">W12–16</span>
-        </div>
-        <div class="row" role="treeitem" data-parent="f2">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g last" style="left:20px"></i></span>
-          <span class="name">04-Spark源码阅读路线.md</span>
-          <span class="desc">看懂一条 SQL 的一生，够用即可</span>
-          <span class="wk">W17</span>
-        </div>
-      </div>
-
-      <button class="row folder" type="button" aria-expanded="true" data-folder="f3">
-        <span class="pre" style="width:20px"><i class="g elbow" style="left:0"></i></span>
-        <span class="name"><span class="chev">▸</span>03-问题清单/</span>
-        <span class="desc">问题驱动的阅读入口</span>
-        <span class="wk">1 篇</span>
-      </button>
-      <div role="group">
-        <div class="row" role="treeitem" data-parent="f3">
-          <span class="pre" style="width:40px"><i class="g" style="left:0"></i><i class="g last" style="left:20px"></i></span>
-          <span class="name">工作问题backlog.md</span>
-          <span class="desc">每周挑一个真实问题作为阅读入口</span>
-          <span class="wk">—</span>
-        </div>
-      </div>
-
-      <button class="row folder" type="button" aria-expanded="true" data-folder="f4">
-        <span class="pre" style="width:20px"><i class="g last" style="left:0"></i></span>
-        <span class="name"><span class="chev">▸</span>04-笔记/</span>
-        <span class="desc">成文的阅读笔记，一篇一个主题</span>
-        <span class="wk">1 篇</span>
-      </button>
-      <div role="group">
-        <div class="row" role="treeitem" data-parent="f4">
-          <span class="pre" style="width:40px"><i class="g last" style="left:20px"></i></span>
-          <span class="name">README.md</span>
-          <span class="desc">笔记索引，还没有成文笔记</span>
-          <span class="wk"><span class="chip-empty">空</span></span>
-        </div>
-      </div>
+  <main class="main" id="main">
+    <div class="topbar">
+      <button class="nav-toggle" id="navToggle" aria-controls="side" aria-expanded="false">目录</button>
+      <span class="topbar-path" id="topPath"></span>
+      <a class="ext" id="extLink" href="README.md" target="_blank" rel="noopener">在外部打开</a>
     </div>
-  </section>
+    <article class="doc" id="doc"></article>
+    <nav class="pager" aria-label="翻页">
+      <button id="prevBtn" type="button"></button>
+      <button id="nextBtn" type="button"></button>
+    </nav>
+  </main>
 
-  <section class="timeline" aria-label="17 周主线">
-    <h2>17 周主线</h2>
-    <div class="bar">
-      <div class="seg seg-0"></div>
-      <div class="seg seg-1"></div>
-      <div class="seg seg-2"></div>
-      <div class="seg seg-3"></div>
-      <div class="seg seg-4"></div>
-    </div>
-    <ul class="legend">
-      <li>
-        <span class="dot" style="background:#1E3A63"></span>
-        <span><span class="lg-name">LangChain / LangGraph</span><span class="lg-sub">阶段 0，3 周</span></span>
-      </li>
-      <li>
-        <span class="dot" style="background:#27466F"></span>
-        <span><span class="lg-name">Datus</span><span class="lg-sub">阶段 1，3 周</span></span>
-      </li>
-      <li>
-        <span class="dot" style="background:#31527D"></span>
-        <span><span class="lg-name">Paimon</span><span class="lg-sub">阶段 2，5 周</span></span>
-      </li>
-      <li>
-        <span class="dot" style="background:#3D5E8C"></span>
-        <span><span class="lg-name">Flink</span><span class="lg-sub">阶段 3，5–6 周</span></span>
-      </li>
-      <li>
-        <span class="dot" style="background:#4A6793"></span>
-        <span><span class="lg-name">Spark</span><span class="lg-sub">阶段 4，1–2 周</span></span>
-      </li>
-    </ul>
-    <p class="pull">前 3 周不是热身，是补地基：LangGraph 没读懂就读 Datus，只能看个热闹。</p>
-  </section>
+</div>
 
-  <footer>
-    静态快照，2026-10-23。新增或删除文件后，让我重新生成即可。.git/ 未展示。
-  </footer>
+<script type="text/markdown" data-path="README.md" data-title="AI 辅助读源码" data-weeks="">
+# AI 辅助读源码
 
-</main>
+目标：用 AI 把「读开源项目」变成一条可执行、可验证、能回填工作的流水线，而不是让 AI 替你概括仓库。
+
+先用 3 周把 LangChain / LangGraph 从「会用」补到「会造」，再依次拿下四个仓库：Datus、Apache Paimon、Apache Flink、Apache Spark。全程约 17 周。
+
+## 这个目录怎么用
+
+| 文件 | 什么时候看 |
+| --- | --- |
+| `01-方法论/AI辅助读源码方法论.md` | 第一次开始前通读一遍，之后每月回看一次 |
+| `01-方法论/提示词库.md` | 每次开一个新的阅读会话，从这里复制提示词 |
+| `01-方法论/笔记模板.md` | 每读完一条链路，按模板成文 |
+| `02-路线图/00-前置-LangChain-LangGraph巩固路线.md` | 第 1-3 周，先把 LangChain/LangGraph 补到能读源码 |
+| `02-路线图/00-总路线图.md` | 决定这周读哪个项目、读到哪一步 |
+| `02-路线图/01-Datus源码阅读路线.md` 至 `04-Spark源码阅读路线.md` | 进入某个项目时看 |
+| `03-问题清单/工作问题backlog.md` | 每周挑一个真实问题作为阅读入口 |
+| `04-笔记/` | 成文的阅读笔记，一篇一个主题 |
+
+## 三条基本原则
+
+1. **问题驱动，不追求读完。** 每个仓库的入口都是工作里一个真实问题（慢、错、不稳定、不满足需求），带着问题读到的代码才留得住。
+2. **AI 负责「导航 + 解释 + 出题」，你负责「验证 + 复述 + 下结论」。** 任何未经 文件:行号 核对的 AI 结论一律不进笔记。
+3. **读完必须留下三样东西：** 一条画得出来的链路、一篇能给别人讲的笔记、一个跑得起来的最小实验。
+
+## 目录结构
+
+```
+AI读源码/
+├── README.md
+├── 01-方法论/
+│   ├── AI辅助读源码方法论.md
+│   ├── 提示词库.md
+│   └── 笔记模板.md
+├── 02-路线图/
+│   ├── 00-前置-LangChain-LangGraph巩固路线.md
+│   ├── 00-总路线图.md
+│   ├── 01-Datus源码阅读路线.md
+│   ├── 02-Paimon源码阅读路线.md
+│   ├── 03-Flink源码阅读路线.md
+│   └── 04-Spark源码阅读路线.md
+├── 03-问题清单/
+│   └── 工作问题backlog.md
+└── 04-笔记/
+    └── README.md
+```
+
+## 最小启动动作（今天就能做）
+
+1. 打开 `Langchain1.0-Langgraph1.0-Learning-main`，按 `00-前置-LangChain-LangGraph巩固路线.md` 做第 1 周的主动回忆练习——关掉文档，从空白文件重写 3 个 phase1 练习。
+2. 克隆 Datus 仓库并锁定版本（见方法论「环境准备」一节）。
+3. 在 Datus 仓库根目录启动 Claude Code / Cursor，用提示词库 P1 生成一份 `CLAUDE.md` 仓库地图。
+4. 从 `03-问题清单` 挑第一个问题，按 `01-Datus源码阅读路线.md` 的 Stage 1 走。
+</script>
+
+<script type="text/markdown" data-path="01-方法论/AI辅助读源码方法论.md" data-title="AI 辅助读源码方法论" data-weeks="">
+# AI 辅助读源码方法论
+
+> 适用：Datus（Python / Agent 框架）、Paimon（Java / 存储）、Flink（Java / 分布式运行时）、Spark（Scala / 查询引擎）。
+> 前提：你已学过 LangChain / LangGraph 的基础用法，阶段 0 会用三周把这块补到「能读源码、能造轮子」的程度。所以下面的方法从「大仓库怎么读」讲起，不再重复框架入门。
+
+## 一、先说结论：AI 的三件正确用法和三种错误用法
+
+**正确用法**
+
+- **导航**：仓库几万行，AI 帮你定位「这个功能在哪个模块、哪个类、哪一行」，你只读该读的部分。
+- **解释**：对一个方法/字段，AI 补上背景（设计约束、历史原因、上下游协议），把你从「语法看懂了但不知道为什么」里拉出来。
+- **出题与找错**：让 AI 根据代码出题考你、检查你的笔记结论、设计最小复现实验。这是收益最高、也最容易被忽略的用法。
+
+**错误用法**
+
+- 让它「总结一下 Flink 的架构」——会得到一篇和官网博客没区别、且可能过期的东西。
+- 一次丢一个大目录让它「讲讲」——上下文被稀释，回答又长又虚。
+- 相信它给的类名和方法签名——大模型对老版本代码记忆很深，对新版本改动经常一本正经地编。
+
+一句话：**AI 是陪你读源码的资深同事，不是替你读源码的替身。**
+
+## 二、四层读法（每个仓库都按这个节奏走）
+
+### L0 地图层：先知道「有什么」，不碰细节（0.5-1 天）
+
+目标产出：一页纸架构图 + 模块职责表 + 一条「最小可运行路径」。
+
+做法：
+1. 只读 `README`、`docs/` 的 Overview、`pom.xml` / `pyproject.toml` 的模块划分。
+2. 用提示词 P1 让 AI 生成仓库地图，**要求每个结论给出 `路径:行号`**，然后自己抽查 3 处。
+3. 跑通官方 quickstart。跑不通就先解决环境，这一步没过，后面全是纸上谈兵。
+
+判断标准：你能不看资料说出「这个项目由哪 5 个模块组成，数据从哪进、从哪出」。
+
+### L1 骨架层：只追一条主链路（每个仓库 3-5 天）
+
+目标产出：一张端到端调用链时序图，从用户入口到最终落点。
+
+做法：
+1. 选一条**最短、最常走**的链路。Flink 选「提交一个 WordCount 作业」，Paimon 选「Flink 写入一张主键表并提交 snapshot」，Datus 选「用户问一句 → 返回一个 SQL 答案」。
+2. 用 P2 逐跳追问：每一跳的「输入是什么、谁调用谁、状态存在哪、失败会怎样」。
+3. 每确认一跳，就把 `类名 + 方法名 + 文件:行号` 记进笔记，形成链条。**链条上的每一环都必须是你亲自打开文件看过的。**
+
+判断标准：能对着白板从入口画到落点，中间不断线。
+
+### L2 机制层：按问题深挖（每个项目挑 4-6 个专题）
+
+骨架是一条线，机制是一个个「点」。每个点用一个**问题卡片**驱动，卡片结构固定：
+
+```
+问题：checkpoint 时如果某个算子一直不来 barrier 会怎样？
+为什么问：线上遇到过 checkpoint 超时
+读哪里：CheckpointBarrierHandler / CheckpointCoordinator 的超时逻辑
+验收：能说出超时后作业的行为（失败？降级？）以及对应配置项
+```
+
+L2 的读法是**以状态变化为中心**，不是以文件为中心。读一个机制时固定问五个问题：
+
+1. 输入是什么（消息、配置、外部事件）？
+2. 内部有哪些状态（内存结构、文件、元数据）？
+3. 状态怎么变（正常路径）？
+4. 边界和异常怎么处理（超时、并发、重启、部分失败）？
+5. 对外暴露什么（配置项、指标、日志、异常类型）？
+
+这五个问题问完，一个机制才算读透。AI 在这里主要帮你做第 3、4 步——异常路径最容易被自己漏掉。
+
+### L3 验证层：输出即检验（每篇笔记 0.5 天）
+
+三种验证手段，按成本从低到高：
+
+- **复述**：合上代码，用自己的话讲一遍链路，然后让 AI 挑错（P9）。讲不顺的地方就是没读懂的地方。
+- **出题**：让 AI 基于代码出 5 道题（P5），答不上来的回头补。
+- **实验**：写最小 demo 或加日志/断点实际跑一遍（P8）。涉及分布式状态的（checkpoint、snapshot、shuffle）尽量做，因为这类机制光看代码必然有理解偏差。
+
+判断标准：你的笔记能让一个没读过这个项目的同事看懂，并且他能顺着笔记自己找到代码。
+
+## 三、防幻觉纪律（硬性规则）
+
+1. **版本锚定。** 进仓库第一件事：`git checkout` 到你要研究的 tag（如 `release-1.20`、`paimon-1.2`），并在每次对话开头告诉 AI「当前版本是 X」。训练数据里的老版本会系统地骗你。
+2. **行号即证据。** 凡是「XX 在这里做的」结论，必须带 `文件:行号`。AI 给不出行号的结论，一律标 `[未验证]`。
+3. **一次一问。** 一条链路、一个机制、一个类。跨模块的大问题拆成小问题串行问。
+4. **交叉验证。** AI 说法 → 官方文档 → 代码注释 → 实际运行，至少对上两项才写进笔记。四者冲突时以代码和运行结果为准。
+5. **警惕流畅。** 回答越顺畅、越像教科书，越要抽查。真正的源码细节往往是反直觉的。
+6. **区分「设计意图」和「实现现状」。** AI 很擅长讲设计意图（因为文档里写了），但实现里可能有 workaround、兼容代码、TODO。读代码时专门留意 `TODO`、`FIXME`、`@Deprecated`、奇怪的 if 分支，那里往往藏着真实世界的约束。
+
+## 四、环境准备（一次性，约半天）
+
+**通用**
+
+- 每个仓库单独克隆，建一个学习分支：`git checkout -b study/<tag>`，不要在你的工作分支上读。
+- 在仓库根目录让 AI 生成 `CLAUDE.md`（或 `.cursor/rules`），内容包括：模块地图、入口类、构建命令、代码风格约定。**这份文件是后续所有会话的上下文底座**，比每次重新解释仓库高效得多。
+- 笔记与代码分离：代码在 D 盘源码目录，笔记在本目录 `04-笔记/`，笔记里只放 `文件:行号` 和链接。
+
+**Java 系（Flink / Paimon / Spark）**
+
+- JDK 11/17（按项目要求）、Maven 3.8+，先跑 `mvn -DskipTests install` 确认能编译。编译不过的项目读起来会非常痛苦，因为无法跳转和调试。
+- IDE 打开后等索引建完再开始；用 IDEA 的「Find Usages」和「Call Hierarchy」配合 AI 使用——AI 负责告诉你「去哪找」，IDE 负责「精确地找」。
+- 装 Mermaid 插件，笔记里的时序图直接在 IDE 里预览。
+
+**Python 系（Datus）**
+
+- `uv` 或 `venv` 建独立环境，`pip install -e .` 可编辑安装，方便打断点。
+- 用 `duckdb` 做本地数据源跑 demo，不要一上来接生产库。
+
+**AI 工具的分工建议**
+
+- **Claude Code / Cursor 在仓库内**：负责搜索、跳转、追链路、改代码做实验。能直接 grep 和读文件，幻觉最少。
+- **网页版对话**：负责概念解释、对比阅读、帮你审笔记。适合贴片段，不适合贴大目录。
+- **本地 grep 仍然是第一手段**：`rg "class CheckpointCoordinator"` 比问 AI 快且准。AI 的价值在「grep 之后怎么串起来」。
+
+## 五、每周节奏（项目驱动版）
+
+一周一个循环，每周至少产出一篇笔记：
+
+| 时间 | 动作 | 产出 |
+| --- | --- | --- |
+| 周一 30 分钟 | 从 backlog 挑一个真实问题，写成问题卡片 | 问题卡片 |
+| 周二-周三 | L1：追这条问题涉及的链路，每跳记 `文件:行号` | 链路草稿 + 时序图 |
+| 周四 | L2：把这个机制的五个问题（输入/状态/变化/异常/对外）答完 | 机制说明 |
+| 周五 | L3：复述 + 出题 + 最小实验；写笔记 | 一篇成文笔记 |
+| 周五 20 分钟 | 更新 backlog：新问题入库，已解决的标结论 | backlog 更新 |
+
+每 4 周做一次**横向对比**（1 小时）：比如「Paimon 的 snapshot 提交 vs Flink 的 checkpoint 完成」「Datus 的 agent loop vs LangGraph 的 StateGraph」。对比是检验理解最狠的方式，也是最能产出洞见的时刻。
+
+## 六、读不同项目的差异化策略
+
+- **Python 项目（Datus）**：代码量小、动态性强，重点不是读实现细节，而是**读出架构决策**——它为什么不用 LangGraph、context 怎么组织、工具怎么注册。读的时候多问「如果是我会怎么设计」。
+- **存储格式（Paimon）**：核心是**元数据与文件布局**。先把「表 → snapshot → manifest → data file」的层次在纸上画清楚，再读代码。存储项目的代码是围绕这几个数据结构的 CRUD，看懂结构就懂了一半。
+- **分布式运行时（Flink）**：最难的是**跨进程、跨线程的状态**。读的时候始终问「这段代码运行在 JobManager 还是 TaskManager？哪个线程？」。建议先读 `flink-runtime` 的部署与调度，再读 `flink-streaming-java` 的算子执行。
+- **查询引擎（Spark）**：核心是**树变换**。Catalyst 的一切都是「Tree + Rule」，读的时候把每条 Rule 当成一个 `Tree → Tree` 的函数，重点看 rule 的匹配条件和幂等性。不要试图读完所有 rule，挑 5 条最常用的。
+
+## 七、常见坑
+
+- **一上来读最难的模块。** Flink 直接读 NetworkStack、Spark 直接读 Tungsten，三天就会放弃。永远从最短链路开始。
+- **只读不跑。** 分布式系统的代码，不跑一遍几乎必然理解错。至少把 demo 跑起来加日志。
+- **笔记写成代码摘抄。** 抄代码没有价值，笔记要写「为什么」和「链路」，代码只留 `文件:行号`。
+- **让 AI 一次读整个文件。** 大文件（几千行的 Operator）要按方法读，让 AI 只解释你圈出的那一段。
+- **忽略配置项和指标。** 配置项是设计意图的索引（有哪些开关说明有哪些路径），指标是运行时行为的索引。读机制时顺手记下相关配置和 metric 名，回填工作特别有用。
+</script>
+
+<script type="text/markdown" data-path="01-方法论/提示词库.md" data-title="提示词库" data-weeks="">
+# 提示词库
+
+用法：复制后把 `<尖括号>` 里的内容替换掉。所有提示词都默认带了「版本锚定 + 行号强制 + 不确定就说不确定」的约束，**不要删掉这几条**，它们是防幻觉的核心。
+
+通用前置句（建议每段对话开头都带上）：
+
+```
+当前仓库：<repo>，版本：<tag/commit>。回答必须遵守：
+1. 每个结论附 `文件路径:行号`；
+2. 找不到依据时明确写「未在代码中找到」，不要猜；
+3. 不确定的地方标注「推测」并说明理由；
+4. 只回答我问的这一条链路，不要展开无关模块。
+```
+
+---
+
+## P1 仓库地图（L0，每个新仓库跑一次）
+
+```
+你是我的源码阅读向导。请先只读 README、docs 的 overview 和构建文件，产出：
+1. 模块清单表格：模块名 | 职责（一句话）| 主要目录 | 大概行数规模；
+2. 一张 Mermaid 架构图，画出模块间依赖和数据流；
+3. 「最小可运行路径」：从用户入口（CLI/API）到最核心逻辑的一条最短调用链，列出每一步的类和方法；
+4. 列出 3 个最适合初读者的入口文件，并说明理由。
+要求：每条结论给 `文件:行号`；不确定的地方标「推测」。最后告诉我，要理解这个项目，哪 3 个概念必须先搞懂。
+```
+
+产出直接存成仓库根目录的 `CLAUDE.md`：
+
+```
+把上面的结果整理成一份 CLAUDE.md，包含：项目定位、模块地图、核心抽象（5 个以内）、
+构建与运行命令、代码风格约定、阅读入口。要简洁，作为后续所有对话的上下文底座。
+```
+
+## P2 调用链追踪（L1，最常用）
+
+```
+入口是 <类名.方法名>（文件:行号）。请追踪它在「<具体场景>」下的执行路径，要求：
+1. 每一跳给出：调用方 → 被调方（类.方法）、文件:行号、这一跳做了什么、输入输出是什么；
+2. 遇到接口/抽象类时，指出运行时实际的实现类是哪个，并说明你是怎么判断的；
+3. 遇到多线程/异步（线程池、消息队列、RPC），单独标注「切换到了哪个线程/进程」；
+4. 输出一张 Mermaid 时序图。
+只追到 <你关心的落点，如：数据写入文件> 为止，不要继续往下展开。
+```
+
+变体：**反向追踪**
+
+```
+<某现象/字段/表> 是从哪里来的？请反向追踪它的写入点和赋值点，直到最上游的来源。
+列出所有写入点，并说明哪个是主路径、哪些是兼容/修复路径。
+```
+
+## P3 机制解释（L2，配合五个问题）
+
+```
+请解释 <机制名> 的完整生命周期，按以下结构回答：
+1. 触发条件：什么情况下会进入这个流程；
+2. 状态：涉及哪些内存结构和持久化数据，分别存在哪；
+3. 正常路径：分步骤描述，每步给 `文件:行号`；
+4. 异常路径：超时、失败、并发冲突、重启时分别怎么处理，给 `文件:行号`；
+5. 对外接口：相关配置项、指标名、日志关键字、抛出的异常类型。
+最后指出：这段代码里有没有 TODO / FIXME / 特殊兼容分支？它们说明了什么约束？
+```
+
+## P4 对比阅读（每 4 周一次）
+
+```
+对比 <项目A的机制X> 和 <项目B的机制Y>，回答：
+1. 两者要解决的问题是否相同？如果不同，各自真正的约束是什么？
+2. 在数据结构/状态模型上的差异；
+3. 在失败恢复上的差异；
+4. 各自的取舍（性能/复杂度/一致性）分别偏向哪边；
+5. 如果我所在的团队同时用两者，最容易踩的坑是什么？
+每条结论给出两边的 `文件:行号` 作为依据。不要为了对称而强行类比。
+```
+
+可用对比清单：Paimon snapshot vs Flink checkpoint；Paimon LSM vs RocksDB；Datus agent loop vs LangGraph StateGraph；Flink 两阶段提交 vs Paimon 的 commit；Spark AQE vs Flink 动态调整并行度。
+
+## P5 出题自测（L3）
+
+```
+基于 <机制名> 的实现，出 6 道题考我，难度递进：
+2 道概念题（考状态模型）、2 道链路题（考调用顺序）、2 道故障题（给一个线上现象，问根因在代码哪一段）。
+先只给题目，我答完再给评分和解析。解析必须引用 `文件:行号`。
+```
+
+## P6 生成图表
+
+```
+把 <链路/机制> 画成 Mermaid 时序图（参与者用真实类名），要求：
+- 标注线程/进程边界（用 Note）；
+- 标注状态变化点；
+- 只画主路径，异常路径用 Note 说明。
+如果信息不足以画完整，先列出缺失的信息点，不要编造参与者。
+```
+
+（状态机用 `stateDiagram-v2`，数据结构层次用 `classDiagram` 或缩进列表。）
+
+## P7 代码考古（理解「为什么」的利器）
+
+```
+这段代码 <文件:行号> 看起来很奇怪 / 是 workaround。请：
+1. 用 git log -L 和 git blame 找到引入它的 commit 和 PR；
+2. 结合 commit message、PR 描述、关联 issue，解释当时要解决什么问题；
+3. 说明今天的代码是否还受那个约束限制。
+如果查不到历史，明确说「无历史记录」，不要用设计意图代替历史事实。
+```
+
+## P8 最小实验设计
+
+```
+我想验证 <机制> 的实际行为。请设计一个最小实验：
+1. 环境：需要哪些依赖、用哪个版本、用什么数据源（优先 duckdb/本地文件）；
+2. 代码：不超过 50 行的 demo，能触发这个机制；
+3. 观察点：加哪些日志/断点/指标，期望看到什么，如果看到 X 说明理解正确；
+4. 反例：怎样构造一个让机制走异常路径的输入。
+给出完整可运行的代码，并说明每一步验证的是哪个假设。
+```
+
+## P9 审我的笔记（L3，写完必做）
+
+```
+以下是我的源码笔记。请只做三件事：
+1. 找出与代码不符或缺少 `文件:行号` 支撑的结论；
+2. 找出我漏掉的关键分支（尤其是异常路径和并发场景）；
+3. 指出我写得含糊、别人看不懂的句子。
+不要重写我的笔记，只列问题清单。
+笔记：<粘贴>
+```
+
+## P10 版本差异阅读（升级/回填工作时用）
+
+```
+我在读 <项目> 的 <旧版本>，现在要升级到 <新版本>。请对比这两个版本在 <模块/机制> 上的差异：
+1. 新增/删除/重命名的核心类；
+2. 行为变化（默认值、协议、元数据格式）；
+3. 兼容性影响；
+4. 建议我优先读的 3 个新文件。
+以两个版本的实际代码为准，不要凭记忆回答。
+```
+
+## P11 把源码结论翻译成工作语言
+
+```
+基于以上源码结论，帮我写一段给团队看的话：
+1. 这个机制在我们的 <Flink/Paimon/Spark 集群> 上意味着什么；
+2. 我们应该关注哪几个配置项和指标；
+3. 出现 <某现象> 时，排查顺序是什么（按代码里的实际路径）。
+用工程师能直接执行的语言，不要复述源码。
+```
+
+---
+
+## 提示词使用纪律
+
+- **P1 每个仓库只跑一次**，结果固化成 `CLAUDE.md`；之后每次会话让它先读这份文件。
+- **P2 是主力**，一周里 70% 的对话应该是 P2 和 P3。
+- **P5、P9 不要省**，它们是「以为读懂了」和「真读懂了」的分界线。
+- 同一段对话不要超过 15 轮。话题切换就开新会话，避免上下文污染。
+- AI 回答完，先做一件事：抽查它给的第一个 `文件:行号`。对不上，整段作废。
+</script>
+
+<script type="text/markdown" data-path="01-方法论/笔记模板.md" data-title="笔记模板" data-weeks="">
+# 笔记模板
+
+文件名：`<项目>-<主题>.md`，例如 `paimon-写入与提交链路.md`、`flink-checkpoint-barrier.md`。
+
+---
+
+~~~markdown
+# <项目> <主题>
+
+- 版本：<tag / commit>
+- 日期：<YYYY-MM-DD>
+- 关联问题：<backlog 里哪个真实问题>
+- 状态：草稿 / 已验证
+
+## 一句话结论
+
+<不超过三行，讲清楚这个机制/链路到底在做什么、解决什么问题。写不出这一句说明还没读懂。>
+
+## 为什么值得读
+
+<和工作场景的关系：线上现象、设计决策、要改造的点。>
+
+## 调用链路
+
+> 每一跳必须是我亲自打开文件确认过的。
+
+| # | 调用 | 文件:行号 | 做了什么 | 输入 → 输出 |
+| --- | --- | --- | --- | --- |
+| 1 | | | | |
+
+```mermaid
+sequenceDiagram
+    %% 参与者用真实类名，线程/进程边界用 Note 标注
+```
+
+## 关键数据结构 / 状态
+
+| 结构 | 所在类 | 存哪里（内存/文件/元数据） | 生命周期 |
+| --- | --- | --- | --- |
+| | | | |
+
+## 五个问题
+
+1. **输入是什么**：
+2. **内部状态**：
+3. **正常路径怎么变**：
+4. **异常与边界**（超时/失败/并发/重启）：
+5. **对外暴露**（配置项 / 指标 / 日志关键字 / 异常类型）：
+
+## 设计取舍
+
+<和其他方案/项目的对比，为什么这么做。AI 的说法要标注哪些是「推测」。>
+
+## 最小实验
+
+```bash
+# 怎么跑、观察什么、期望结果
+```
+
+## 我的疑问（未解决）
+
+- [ ] <问题> —— 下一步怎么验证
+
+## 待验证 / 不确定
+
+- [ ] <结论> `[未验证]` —— 需要核对 <文件>
+
+## 对工作的启发
+
+<配置建议、排查顺序、改造方案。这一节是笔记的价值所在。>
+~~~
+
+---
+
+## 写作要求
+
+- 链路表里的每一行都要有 `文件:行号`，没有的不写。
+- 代码不整段粘贴，超过 10 行的代码只截关键 3-5 行并注明上下文。
+- 「设计取舍」和「对工作的启发」是两节必须写的内容，前者防止只知其然，后者防止读完就忘。
+- 一篇笔记只写一个主题。链路超过 8 跳就拆成两篇。
+- 写完跑一遍 P9，把 AI 挑出的问题处理完再标「已验证」。
+</script>
+
+<script type="text/markdown" data-path="02-路线图/00-总路线图.md" data-title="总路线图" data-weeks="W1–17">
+# 总路线图
+
+## 五个阶段
+
+| 阶段 | 项目 | 周数 | 一句话目标 |
+| --- | --- | --- | --- |
+| 0 | LangChain / LangGraph | 3 | 从「会用框架」补到「能读框架、能造轮子」 |
+| 1 | Datus | 3 | 看一个真实产品怎么把 Agent 工程化 |
+| 2 | Paimon | 5 | 吃透湖仓底座的数据模型与提交机制 |
+| 3 | Flink | 5-6 | 打通分布式运行时的提交、执行、checkpoint |
+| 4 | Spark | 1-2（按需） | 看懂一条 SQL 的一生，够用即可 |
+
+全程约 17 周。前 3 周不是热身，是补地基——**LangGraph 没读懂就读 Datus，只能看个热闹**，因为你看不出它哪些地方是照抄运行时、哪些是自己的设计。
+
+## 为什么是这个顺序
+
+1. **LangChain / LangGraph（3 周）**——你的基础只到「跑通 demo」，缺的是抽象层和运行时。而 LangGraph 1.0 本身就是一个设计精良的小型分布式执行引擎（超步、状态合并、checkpoint），读它的源码难度正好，收益直接作用于后面三个项目。
+2. **Datus（3 周）**——和你的工作直接重叠，Python 代码量小。刚补完 LangGraph，正好带着「如果是我会怎么设计」的眼光去读，对比最有价值。
+3. **Paimon（5 周）**——你天天在用，代码规模适中、数据结构清晰。Paimon 的 snapshot 和 Flink 的 checkpoint 是同一类「一致性快照」问题，先读它能给 Flink 铺路。
+4. **Flink（5-6 周）**——最大的坑，放后面是因为它需要前面积累的耐心和方法。
+5. **Spark（1-2 周）**——工作中够用即可，只有做查询优化才深挖 Catalyst。
+
+> 如果工作里有紧急的 Flink 问题，允许插队：临时按 `03-Flink源码阅读路线.md` 的 Stage 1-2 读两周，处理完再回到主线。项目驱动意味着顺序可变，但每个项目都必须走完 L1 骨架层。
+
+## 17 周主线
+
+| 周 | 项目 | 阶段 | 本周产出 |
+| --- | --- | --- | --- |
+| 1 | LangChain | 主动回忆 + 抽象层源码（Runnable / ChatModel / Tool） | `mini_chain.py` + 一篇 Runnable 笔记 |
+| 2 | LangGraph | 运行时源码（Pregel / channel / checkpointer） | `mini_graph.py` + 超步执行笔记 |
+| 3 | 综合 | 重做 phase4 一个项目：可观测 / 健壮性 / 评估 / 流式 | 可演示项目 + 「上生产还差什么」清单 |
+| 4 | Datus | 环境 + L0 地图 + 跑通 | 仓库地图 `CLAUDE.md`、一次完整问答 |
+| 5 | Datus | L1：一问一答的完整链路 | 时序图 + 链路表 |
+| 6 | Datus | L2：context 工程、subagent、工具层 | 专题笔记 2 篇 + 与 LangGraph 的对比 |
+| 7 | Paimon | L0 地图 + 概念模型（表/snapshot/manifest/file） | 一张元数据层次图 |
+| 8 | Paimon | L1：Flink 写入 → commit → snapshot | 写链路笔记 |
+| 9 | Paimon | L1：读路径（scan → split → merge-on-read） | 读链路笔记 |
+| 10 | Paimon | L2：compaction / changelog / lookup | 专题笔记 1-2 篇 + 最小实验 |
+| 11 | Paimon | L2：主键表、bucket、小文件；回填工作 | 一篇「我们的表该怎么建」实践笔记 |
+| 12 | Flink | L0 地图 + L1：作业提交链路（四种图） | 提交链路笔记 |
+| 13 | Flink | L1：Task 执行与网络栈 | 执行链路笔记 |
+| 14 | Flink | L2：checkpoint 全链路 | 专题笔记 + 时序图 |
+| 15 | Flink | L2：状态与性能 或 Table/SQL（按工作问题二选一） | 专题笔记 |
+| 16 | Flink | L3：输出与复盘 | 《一个 Flink SQL 作业的一生》+ 案例复盘 |
+| 17 | Spark | L1：一条 SQL 的一生 + Paimon-Spark 集成 | 生命周期笔记 + 对比笔记 |
+
+每 4 周安排一次 1 小时横向对比（第 3、7、11、15 周末），题目见提示词库 P4。第一场对比建议就是「你的 mini_graph vs LangGraph vs Datus」。
+
+## 时间不够时的最小版本
+
+只投入一半时间时，按这个顺序砍：
+
+- **阶段 0 压到 2 周**：跳过 Stage 3 的评估与成本优化，只保留可观测和健壮性；mini_graph 只做节点、边、内存 checkpointer。
+- Datus 的 MCP / 前端不读。
+- Paimon 的 Spark 集成、z-order 细节不读。
+- Flink 的 HA、Metrics、REST 不读。
+- Spark 只读 Stage 1。
+
+**不能砍的**：阶段 0 的第 2 周（Pregel 运行时）、每个项目的 L1 主链路、Paimon 的 commit、Flink 的 checkpoint、每篇笔记的「对工作的启发」。
+
+## 每个阶段的完成标准（硬指标）
+
+一个阶段算「读过」而不是「看过」，需要同时满足：
+
+1. 有可运行的产出（阶段 0 是两个 mini 框架 + 一个 demo；其余项目是仓库地图 + 笔记）；
+2. 笔记都标「已验证」，链路表每一行都有 `文件:行号`；
+3. 能不看资料画出主链路时序图；
+4. 能答出对应路线文档「验收问题」中的 80%；
+5. 至少有一篇笔记的「对工作的启发」在工作里被用过（改一个配置也算）。
+
+## 和现有学习的关系
+
+`Langchain1.0-Langgraph1.0-Learning-main` 那套仓库从「素材」变成「考卷」：不再从头看一遍，而是关掉它自己重写练习，再打开对照。会做但写不出的地方，才是你真正要补的地方。
+
+阶段 0 结束后，建议在那边仓库补一个 `phase5_source_reading/` 目录，放 `mini_chain.py`、`mini_graph.py` 和对比笔记——那套仓库是你的实践区，这套 `AI读源码` 是方法论和路线区，两边互相引用即可。
+
+`精益数据分析`、`博弈论` 那些笔记属于另一条线，不受影响。
+</script>
+
+<script type="text/markdown" data-path="02-路线图/00-前置-LangChain-LangGraph巩固路线.md" data-title="LangChain / LangGraph 巩固提高路线（3 周）" data-weeks="W1–3">
+# LangChain / LangGraph 巩固提高路线（3 周）
+
+> 定位：不是把 `Langchain1.0-Langgraph1.0-Learning-main` 的教程再刷一遍，而是补上「基础」和「提高」之间的三段差距——抽象层、运行时、工程化。
+> 这一阶段同时是读 Datus 的热身：你在这里读懂了 LangGraph 的运行时，读 Datus 时才有对照物。
+
+## 先诊断：基础薄弱通常缺的是这三样
+
+1. **抽象层**：会用 `prompt | model | parser`，但说不清 `Runnable` 是怎么把任意函数变成可组合管道的；会用 `bind_tools`，但不知道工具描述是怎么序列化进请求的。
+2. **运行时**：会画 `StateGraph`，但说不清「一步」到底怎么执行、状态怎么合并、checkpointer 什么时候写盘。
+3. **工程化**：能跑通 demo，但没做过评估、重试、流式、人在回路、可观测性这些「上生产」的环节。
+
+对症下药，每周补一样。判断标准不是「看完了」，而是**能徒手写出来**。
+
+## Stage 1（第 1 周）：LangChain 抽象层
+
+**主动回忆练习**（每天 1 小时，不查文档）：把已有的 phase1/phase2 练习挑 6 个，关掉仓库、关掉文档，从空白文件重写。写不出来的地方就是漏洞。
+
+**源码精读**（挑 3 个文件，不求读全）：
+
+- `langchain_core/runnables/base.py`：`Runnable`、`RunnableSequence`、`RunnableParallel`、`RunnableLambda`。搞清楚 `invoke / batch / stream / astream_events` 四套方法是怎么统一的，为什么管道能自动支持流式。
+- `langchain_core/language_models/chat_models.py`：`BaseChatModel` 的调用路径，`bind_tools` 把工具塞到了请求的哪个字段。
+- `langchain_core/tools/base.py`：`@tool` 装饰器做了什么，参数 schema 从哪来，工具调用结果怎么回填成 `ToolMessage`。
+
+**产出**：
+- 一个 300 行左右的 `mini_chain.py`，实现 `Runnable` 风格的 `|` 组合、`invoke`、`stream`，能跑一个「prompt → model → 解析」的链路。
+- 笔记《Runnable 是怎么把函数变成可组合管道的》。
+
+## Stage 2（第 2 周）：LangGraph 运行时
+
+这是最重要的一周。LangGraph 1.0 是 LangChain 1.0 的运行时底座，读懂它，`create_agent` 和 middleware 就都是「上面的糖」。
+
+**按这条线读**：
+
+```
+StateGraph（图定义）
+  → Pregel（超步执行模型：plan → execute → update）
+  → Channel / Reducer（状态怎么合并，为什么默认是覆盖、什么时候要 add_messages）
+  → Checkpointer（每个超步后写什么、存在哪、如何 resume）
+  → interrupt / Command（人在回路怎么暂停和恢复）
+  → Subgraph / Send（子图和动态并行）
+```
+
+**源码入口**（版本以你安装的为准）：`langgraph/graph/state.py`、`langgraph/pregel/`（`loop.py` 是核心）、`langgraph/checkpoint/`。
+
+**动手**：
+- 用 LangSmith 跑一次多轮对话 + 一次 interrupt，把 trace 里每个 span 和源码里的调用对上。**trace 是最好的源码地图**。
+- 写一个 200 行的 `mini_graph.py`：支持节点、边、条件边、状态 reducer、内存 checkpointer。
+
+**产出**：
+- 笔记《LangGraph 的一步是怎么执行的》（超步、并发、状态合并、checkpoint 时机）。
+- 一张对比表：`create_agent` / 手写 StateGraph / 你的 mini_graph，三者在「循环、工具调用、中断、恢复」上分别怎么实现。
+
+## Stage 3（第 3 周）：工程化 + 综合
+
+从 `phase4_projects` 里挑一个（建议 multi-agent 或 rag 那个），**重做一遍，但按生产标准**：
+
+1. **可观测**：全链路接 LangSmith，能看出每次模型调用的 token、耗时、工具入参出参。
+2. **健壮性**：模型超时重试、工具异常兜底、结构化输出解析失败的重试与降级。
+3. **评估**：写 10 条固定测试用例（输入 → 期望行为），每次改动跑一遍，记录通过率。
+4. **流式与中断**：前端能逐字显示，能在关键步骤暂停等人确认。
+5. **成本与延迟**：统计一次请求的 token 和耗时，找出最贵的一步并优化（换小模型、裁剪上下文、缓存）。
+
+**产出**：
+- 一个能演示的项目 + 一份《这个 Agent 上生产还差什么》清单。
+- 一篇总结《我从「会用」到「会造」补上的三件事》。
+
+## 和 Datus 的衔接
+
+第 3 周末做一次 30 分钟的预演：打开 Datus 的 README 和目录结构，只回答一个问题——「如果让我用 LangGraph 实现它，我会怎么画图？」把这张图存下来。三周后读完 Datus，再回来对照，差异就是你要学的东西。
+
+## 验收问题（能答 80% 才算巩固完成）
+
+1. `Runnable` 的 `invoke` 和 `stream` 在基类里是什么关系？为什么自定义组件只实现一个就能两个都能用？
+2. `bind_tools` 之后，工具描述出现在请求的哪个位置？模型返回的工具调用长什么样？
+3. LangGraph 的「超步」是什么？同一超步里的多个节点是并发还是串行？状态冲突怎么解决？
+4. reducer 什么时候被调用？`add_messages` 相比默认覆盖解决了什么问题？
+5. checkpointer 在哪个时刻写入？恢复时从哪个点继续？中断恢复和失败重试走的是同一条路吗？
+6. `interrupt` 暂停后，进程重启还能恢复吗？靠什么？
+7. 你的 mini_graph 和 LangGraph 最大的差距在哪三处？
+8. 一个 Agent 上生产，除了功能，还必须有哪四样东西？
+
+## 时间不够时的压缩方案
+
+只有 2 周：砍掉 Stage 3 的评估和成本优化，只保留可观测 + 健壮性；Stage 1 的主动回忆减到 3 个练习。
+只有 1 周：只做 Stage 2，并且只读 Pregel 循环 + checkpointer 两块，mini_graph 只实现节点、边、内存 checkpointer。
+
+## 常见坑
+
+- **不要重刷教程**。看视频和抄示例会产生「会了」的错觉，主动回忆才会暴露真实水平。
+- **不要试图读完 langchain-core**。它是巨型库，只读上面列的三个文件，其余用到再看。
+- **不要跳过 trace**。LangGraph 是异步、批量、并发的，光看代码很难建立时序感，trace 能直接给你真实执行顺序。
+- LangChain 1.0 的 middleware 是新东西，网上资料少，读源码时以 `langchain/agents/middleware/` 为准。
+</script>
+
+<script type="text/markdown" data-path="02-路线图/01-Datus源码阅读路线.md" data-title="Datus 源码阅读路线（3 周）" data-weeks="W4–6">
+# Datus 源码阅读路线（3 周）
+
+> Datus 是开源的「数据工程 Agent」，定位是让 AI 直接和数据库/数仓对话、生成并执行 SQL、沉淀数据上下文。
+> 仓库具体布局会随版本变化，**本路线中的所有结构描述都需要你在 Stage 0 用 P1 提示词重新核对一遍**，核对结果直接覆盖本文件末尾的「仓库地图」小节。
+
+## 为什么排在第二个
+
+- 和你的工作重叠度最高：你既做数据平台，又在学 Agent，Datus 正好是两者的交叉点。
+- Python 代码量小，3 周能读完主干。
+- 刚做完阶段 0（LangChain/LangGraph 巩固），你手上有 `mini_graph` 和 Pregel 的理解，读 Datus 时每个设计都能立刻找到对照物：「这里是状态机还是自研循环」「它的持久化和 checkpointer 差在哪」。**这个对照，就是这一阶段最大的收获。**
+
+## 前置知识
+
+- 阶段 0 全部完成，尤其是 LangGraph 运行时那一周：说得清超步、reducer、checkpointer、interrupt。
+- 自己的 `mini_graph.py` 还在，随时能翻。
+- 一点 Text2SQL 的常识（schema 检索、few-shot、执行反馈重试）。
+- 不需要懂 Flink/Paimon。
+
+## Stage 0：跑通（2-3 天）
+
+不跑通不读代码。
+
+1. 克隆仓库，锁定到最新 release tag，记录版本号。
+2. 按 README 安装（大概率是 `pip install -e .` 或 `uv sync`），准备一个本地 DuckDB 或 SQLite 数据源。
+3. 跑一次完整的交互：提问 → 生成 SQL → 执行 → 返回结果。**把每一步的日志留下来**。
+4. 用 P1 生成 `CLAUDE.md` 仓库地图，抽查 3 处行号。
+5. 用 P7 搞清楚「`datus` 命令的入口函数在哪」。
+
+验收：能用一条命令启动，用自然语言问出一个 SQL 答案，并且知道这个回答经过了哪几个模块（哪怕只是名字）。
+
+## Stage 1：主链路（第 1 周后半 - 第 2 周）
+
+**唯一目标：把「用户一句话 → 最终答案」这条链路走通，每跳留行号。**
+
+按这个顺序追，不要跳：
+
+1. **入口层**：CLI / API 入口 → 会话初始化（加载配置、连接数据源、加载上下文）。
+2. **Agent 循环**：一次用户输入如何进入循环？循环的终止条件是什么？最多几轮？
+3. **上下文组装**：这一轮送给 LLM 的 prompt 里到底有什么？schema、指标、历史 SQL、工具描述分别从哪来、怎么排序、怎么裁剪？
+4. **工具调用**：模型返回工具调用后，谁负责分发？工具注册表长什么样？SQL 执行工具怎么连数据库、怎么处理超时和错误？
+5. **结果回写**：执行结果如何回到模型、如何形成最终回答、如何持久化到会话历史。
+
+每追完一跳，填进笔记模板的链路表。追完后画时序图，标注哪些步骤是同步、哪些是流式。
+
+**关键问题**（这一周必须回答的）：
+
+- 它用的是自己的 agent loop，还是 LangGraph/LangChain？为什么？
+- 工具是怎么注册的？加一个新工具要改几个文件？
+- 上下文有没有预算控制？超长时怎么截断？
+- LLM 调用失败/超时/返回非法 JSON 时怎么处理？
+
+## Stage 2：专题（第 3 周）
+
+按下面的专题各写一篇笔记，顺序可按兴趣调整：
+
+**专题 1：Context Engineering（最重要）**
+Datus 的核心卖点大概率就在这里。要搞清楚：数据上下文（表结构、字段描述、指标定义、示例 SQL、业务语义）以什么形式存储、怎么检索（向量？关键词？还是结构化索引？）、怎么注入 prompt、怎么随会话演进。这是你能直接搬回工作的部分——你们内部的 Text2SQL 大概率卡在上下文上。
+
+**专题 2：Subagent 编排**
+有没有多个角色（如「调研 agent」「SQL agent」「校验 agent」）？它们之间怎么交接？是串行、并行还是路由？和 LangGraph 的 supervisor 模式比，差别在哪、为什么。
+
+**专题 3：工具与数据源适配层**
+数据库适配器怎么抽象？支持哪些方言？方言差异（分页、函数、日期）在哪一层处理？加一个新数据库要做什么。
+
+**专题 4：质量保障**
+有没有 SQL 校验、执行前 dry-run、结果自检、重试、评估集？这部分往往最粗糙，也最能体现工程成熟度——读它是为了知道「做一个能上生产的 Agent 还缺什么」。
+
+**专题 5（可选）：MCP / 外部集成**
+如果版本支持 MCP，看它作为 client 怎么接外部工具，和你们未来可能的集成方案对照。
+
+## Stage 3：对比与输出（第 3 周末）
+
+做一次三方对比，写《mini_graph / LangGraph / Datus：三个 Agent 运行时》，对比五点：
+
+| 维度 | 你的 mini_graph | LangGraph | Datus |
+| --- | --- | --- | --- |
+| 执行模型（循环怎么驱动） | | 超步（Pregel） | |
+| 状态与合并（reducer） | | | |
+| 持久化（checkpointer / session） | | | |
+| 中断与恢复 | | | |
+| 工具注册与调用 | | | |
+
+再翻出阶段 0 第 3 周末画的「如果我用 LangGraph 实现 Datus」那张预演图，对照实际代码，把你猜错的地方单独列一节——**猜错的地方就是你对 Agent 工程理解最薄弱的地方**。
+
+## AI 提示词（针对 Datus）
+
+- P2 场景：`入口是 <cli 入口函数>，追踪「用户提问：<问题>」这一次请求的完整路径，直到返回答案。`
+- P3 场景：`请解释 context 的构建流程：从会话开始到拼出 prompt，涉及哪些数据源、如何筛选和排序。`
+- P4 场景：`对比 Datus 的 agent loop 和 LangGraph 的 StateGraph 在 <状态/中断/重试> 上的差异。`
+- P8 场景：`设计一个最小实验：给 Datus 接一个本地 duckdb，验证 <schema 检索> 是否真的生效（比如加一个无关表看它会不会被注入）。`
+
+## 验收问题（能答 80% 算过）
+
+1. 一条用户请求从进来到返回，经过了哪些模块？画出时序图。
+2. 送给 LLM 的 prompt 由哪几部分组成？各部分从哪来？
+3. 工具调用的完整生命周期是什么？失败怎么处理？
+4. 会话状态存在哪？重启后还在吗？
+5. 加一个新的数据源需要改哪些地方？
+6. 它的上下文检索是语义检索还是结构化检索？为什么这么选？
+7. 它为什么没有直接用 LangGraph？如果换成 LangGraph 实现，哪些能力能白拿（超步、checkpoint、中断），哪些拿不到或更难做？
+8. 如果要把它接到公司内部数仓，最大的三个障碍是什么？
+
+## 仓库地图（Stage 0 核对后覆盖这里）
+
+| 模块/目录 | 职责 | 核心类/函数 | 备注 |
+| --- | --- | --- | --- |
+| | | | |
+
+## 常见坑
+
+- 不要把时间花在 UI / 前端上，除非你的工作要做产品化。
+- Python 项目的「实现」往往很薄，价值在 prompt 和数据结构里，读的时候多看 prompt 模板和配置。
+- 版本迭代快，网上博客大概率过期，一切以你 checkout 的代码为准。
+</script>
+
+<script type="text/markdown" data-path="02-路线图/02-Paimon源码阅读路线.md" data-title="Paimon 源码阅读路线（4-5 周）" data-weeks="W7–11">
+# Paimon 源码阅读路线（4-5 周）
+
+> 仓库：apache/paimon（Java）。建议从 `paimon-1.2` 或你生产环境对应的版本开始，先把版本号写死在笔记顶部。
+> Paimon 的代码结构非常规整：`paimon-core` 是主体，`paimon-flink` / `paimon-spark` 是引擎适配。
+
+## 为什么第二个读它
+
+你的 Flink 作业在写 Paimon，问题大概率集中在：写入慢、小文件多、snapshot 膨胀、compaction 不及时、读得慢。这些问题的答案全在 `paimon-core` 里。而且它的数据结构清晰，是读 Flink 之前最好的热身——Paimon 的 snapshot 和 Flink 的 checkpoint 本质是同一类「分布式一致性快照」问题。
+
+## 前置知识
+
+- LSM Tree 的基本概念（memtable / sstable / compaction / 布隆过滤器）。不懂的话先花 2 小时补，否则读 `KeyValueFileStore` 会很痛苦。
+- 列式文件格式的常识（ORC/Parquet 的 row group、stripe）。
+- 知道 Flink 的 checkpoint 是什么（不用懂实现）。
+
+## Stage 1：概念模型（第 1 周）
+
+**这一周不读实现，只读概念。** 读官方文档的 Concepts 章节 + `paimon-core` 里的模型类。
+
+要建立的层次感：
+
+```
+Table（表定义 + Schema）
+  └── Snapshot（某一时刻的完整视图，带 id 和 schema）
+        ├── ManifestList（清单的清单）
+        │     └── ManifestFile（一批数据文件的元信息）
+        │           └── ManifestEntry（单个文件的增/删记录）
+        └── DataFile（实际数据，ORC/Parquet）
+```
+
+配套要搞懂的概念：分区（partition）、桶（bucket）、主键（primary key）、LSM 的 level、sequence number、文件类型（data / changelog / index）。
+
+用 P1 把 `paimon-core` 的包结构画出来。用 P3 问：「一次写入从开始到产生新 snapshot，元数据是怎么演进的？」
+
+验收：能在纸上画出「表 → snapshot → manifest → data file」的关系，并解释为什么要三层（为什么不把文件列表直接放在 snapshot 里）。
+
+## Stage 2：写链路（第 2 周）
+
+主链路（Flink 写入一张主键表）：
+
+```
+Flink Sink → TableWrite → BatchWrite → 写文件 + 收集元数据
+            → TableCommit → 生成 Manifest → 生成 Snapshot → 原子提交
+```
+
+按顺序读：
+
+1. `FileStoreTable` / `KeyValueFileStore`：表的抽象，决定用哪种 store（append-only vs key-value）。
+2. `TableWrite` 与 `BatchWrite`：一次 checkpoint 对应一个 batch；内存里怎么攒数据（`SortBuffer`）、什么时候 flush 成文件。
+3. `MergeFunction`：主键表的核心。`Deduplicate` / `PartialUpdate` / `Aggregation` 分别怎么合并同 key 的多条记录。
+4. `TableCommit`：最精彩的部分。多个 writer 的元数据怎么合并、怎么保证提交原子性（靠文件系统的 rename？靠锁？）、冲突怎么重试。
+5. `Snapshot` 的生成与清理：snapshot 过期策略、旧文件何时删。
+
+重点问题：
+- 为什么 commit 要两阶段（prepare/commit）？失败在中间会怎样？
+- 多个并发 writer 提交时，谁负责合并？乐观锁怎么做的？
+- bucket 数量怎么影响写入并行度和读放大？
+- `bucket = -1`（dynamic bucket）和固定 bucket 的差别在哪？
+
+## Stage 3：读链路（第 3 周）
+
+```
+TableScan → FileStoreScan（按 snapshot + 分区/过滤条件筛 manifest）
+          → 生成 DataSplit（可能多个文件需要合并）
+          → MergeTreeSplit / MergeOnRead（主键表要合并多版本）
+          → 返回给引擎（Flink Source / Spark Scan）
+```
+
+重点：
+- 谓词下推在哪一层做（manifest 级别的分区裁剪、文件级别的 min/max 统计、行级别的 ORC/Parquet 索引）。
+- 主键表「读时合并」的代价：读 10 个文件只为拿到最新版本，这就是为什么要 compaction。
+- `MergeTreeSplit` 怎么决定哪些文件一起读（level 的概念在这里落地）。
+
+验收：能解释「查一条主键最新值」为什么可能读多个文件，以及什么情况下会退化成全表扫。
+
+## Stage 4：专题（第 4 周，按工作问题挑 2-3 个）
+
+- **Compaction**：谁触发（Flink 里的 compact 算子 / 独立 compact 作业 / 写时触发）、合并策略（minor/major、full compaction）、和 snapshot 的关系、为什么 compaction 会拖慢写入。
+- **Changelog Producer**：`none` / `input` / `lookup` / `full-compaction` 四种模式的实现差异，对流读的影响。**这是你们做实时链路时最容易踩坑的地方。**
+- **Lookup**：点查是怎么做的（本地缓存 + 远程读），和 Flink lookup join 的配合。
+- **小文件问题**：什么配置控制文件大小、为什么会有小文件、怎么合并。
+- **Z-order / 排序**：多维聚簇的实现，读 `ZOrderUDF` 一类的东西。
+- **Spark 集成**：`paimon-spark` 的 Scan/Write 怎么复用 core，DataSourceV2 的接口在哪实现。
+
+## Stage 5：回填工作（第 5 周）
+
+写一篇《我们的 Paimon 表该怎么建》实践笔记，包含：分区键/主键/桶数的选择依据（引用代码里 bucket 影响读放大的地方）、compaction 配置建议、changelog 模式选择、监控指标清单。这篇笔记要能直接给团队用。
+
+## 关键类速查表
+
+| 关注点 | 类 | 模块 |
+| --- | --- | --- |
+| 表抽象 | `FileStoreTable`、`AbstractFileStoreTable` | paimon-core |
+| 主键表 | `KeyValueFileStore`、`KeyValueTableWrite` | paimon-core |
+| 追加表 | `AppendOnlyFileStore` | paimon-core |
+| 写入批次 | `BatchWrite` 及其实现 | paimon-core |
+| 提交 | `TableCommit`、`FileStoreCommit` | paimon-core |
+| 元数据 | `Snapshot`、`ManifestFile`、`ManifestEntry`、`DataFileMeta` | paimon-core |
+| 扫描 | `FileStoreScan`、`DataSplit`、`MergeTreeSplit` | paimon-core |
+| 合并函数 | `MergeFunction` 及 `Deduplicate` 等 | paimon-core |
+| Flink 适配 | `FlinkSink`、`FlinkSource`、`FlinkCatalog`、compact 相关算子 | paimon-flink |
+| Spark 适配 | Spark Scan/Write | paimon-spark |
+
+> 类名以你 checkout 的版本为准，Stage 1 核对后修正。
+
+## AI 提示词（针对 Paimon）
+
+- P2：`从 org.apache.paimon.table.sink.TableWrite 的 write 方法开始，追踪「Flink 一次 checkpoint 内的一批数据」如何变成一个新的 snapshot。`
+- P3：`解释 Paimon 的 commit 流程：prepare 和 commit 各做什么，如何保证原子性，并发冲突怎么处理。`
+- P4：`对比 Paimon 的 snapshot 和 Iceberg 的 snapshot 在元数据组织上的差异。`
+- P8：`设计实验：本地写一张主键表，连续写 3 批，每批后打印 snapshot 列表和 manifest 内容，验证元数据演进。`
+
+## 验收问题（能答 80% 算过）
+
+1. 表 → snapshot → manifest → data file 的层次关系，为什么这么设计？
+2. 一次 Flink checkpoint 的数据在 Paimon 里经历了什么？
+3. 多个 writer 并发提交怎么保证不丢数据、不重复？
+4. 主键表的读为什么要合并多个文件？compaction 如何缓解？
+5. 四种 changelog 模式的差别，分别适用什么场景？
+6. 小文件是怎么产生的？哪几个配置能控制？
+7. 谓词下推发生在哪几层？
+8. 如果线上出现「snapshot 数量暴涨」，按代码路径该怎么排查？
+
+## 常见坑
+
+- 不要一开始就读 `paimon-flink`，先读 `paimon-core` 的模型和写入，否则会被 Flink 的算子代码带偏。
+- `ManifestEntry` 有 ADD/DELETE 两种，读元数据演进时一定要注意「删除」是怎么表达的——这是理解 snapshot 隔离性的关键。
+- Paimon 版本迭代快，类名和方法签名变化大，AI 训练数据里的可能是 0.5/0.8 的版本，务必以你的 tag 为准。
+</script>
+
+<script type="text/markdown" data-path="02-路线图/03-Flink源码阅读路线.md" data-title="Flink 源码阅读路线（5-6 周）" data-weeks="W12–16">
+# Flink 源码阅读路线（5-6 周）
+
+> 仓库：apache/flink（Java）。读之前先确定你的目标版本（生产用的 1.18/1.20，或 2.x），不同版本 API 差异不小，尤其 `SinkV2`、`StreamTask`、Table 层。
+> **只读三个模块**：`flink-runtime`、`flink-streaming-java`、`flink-table`。其余（connectors、kubernetes、python、ml）一概不看。
+
+## 为什么第三个读
+
+Flink 是这四个里最大的坑，也是最容易半途而废的。放在 Paimon 之后读，是因为你已经理解「快照」这套语义，Flink 的 checkpoint 会顺很多；而做完前两个项目，你的阅读方法也已经成熟。
+
+## 先建立一个心法：永远先问「这段代码跑在哪个进程、哪个线程」
+
+Flink 的代码难，难在跨进程、跨线程的状态。读每个方法前先定位：
+
+- JobManager 侧：`Dispatcher`、`JobMaster`、`Scheduler`、`CheckpointCoordinator`
+- TaskManager 侧：`TaskExecutor`、`Task`、`StreamTask`、算子线程、IO 线程、网络线程
+- 客户端侧：`CliFrontend`、`StreamGraph` 生成
+
+笔记里每个方法都标上「JM / TM / Client」，链路表里加一列「线程」。这一列比任何注释都有用。
+
+## Stage 1：作业提交链路（第 1-2 周）
+
+从 `flink-examples` 的 WordCount 出发，追一条链：
+
+```
+CliFrontend.main
+  → parseAndRun → PackagedProgram(用户 main)
+  → StreamExecutionEnvironment.execute
+  → StreamGraphGenerator → StreamGraph        （逻辑图：算子 + 边）
+  → StreamingJobGraphGenerator → JobGraph    （物理图：算子链、分区）
+  → RestClusterClient.submitJob
+  → Dispatcher → JobManagerRunner → JobMaster
+  → DefaultExecutionGraphBuilder → ExecutionGraph（并行度、中间结果）
+  → DefaultScheduler → SlotPool 申请 slot
+  → TaskDeploymentDescriptor → TaskExecutor
+  → Task.run → StreamTask.invoke
+```
+
+每一步要回答：**输入是什么对象，输出是什么对象，图上发生了什么变化**。四种图（StreamGraph / JobGraph / ExecutionGraph / 物理执行）的区别是这一阶段的核心收获。
+
+配套要读的：
+- 算子链（operator chain）是怎么形成的（`StreamingJobGraphGenerator` 里的 chain 条件），这直接解释了「为什么上游并行了下游也并行」和「为什么有时不能 chain」。
+- Slot / SlotSharingGroup / 资源申请，解释了「为什么 slot 不够作业起不来」。
+- 作业失败后的重启：`RestartStrategy`、`DefaultScheduler` 的 failover 逻辑。
+
+验收：能画出四种图的转换关系，并解释每一步转换解决了什么问题。
+
+## Stage 2：任务执行与数据交换（第 3 周）
+
+```
+Task.run → StreamTask.invoke
+  → 初始化 OperatorChain（StreamOperator 按链顺序 head/tail）
+  → StreamTask 主循环：处理输入 → 调用算子 → 输出
+  → StreamOperator.processElement → 用户函数
+  → RecordWriter → ResultPartition → ResultSubpartition → Netty → InputGate → RecordReader
+```
+
+重点：
+- `StreamTask` 的 mailbox 模型（Flink 1.13+ 之后所有事件都走 mailbox），解释了 checkpoint、watermark、数据记录为什么能在同一个线程里有序处理——**这是理解后面所有机制的前提**。
+- 网络栈：`ResultPartition` / `InputGate` / `BufferPool`，基于 credit 的反压（`BufferDebloater`），解释了「反压」到底反在哪、为什么看 `outPoolUsage` / `inPoolUsage`。
+- 内存管理：`MemorySegment`、`MemoryManager`、`NetworkBufferPool`，解释了「网络缓冲不够」和「直接内存 OOM」。
+
+验收：能解释一条记录从上游算子到下游算子经过了哪些缓冲区和线程，以及反压如何逐级传导。
+
+## Stage 3：Checkpoint 全链路（第 4 周，核心中的核心）
+
+这是和 Paimon 对接最紧的部分，也是线上问题最多的部分。
+
+```
+CheckpointCoordinator.triggerCheckpoint（JM 定时器触发）
+  → 向 Source 下发 CheckpointBarrier
+  → Source 注入 barrier → 随数据流向下游
+  → StreamTask 收到 barrier → CheckpointBarrierHandler
+      （对齐：等所有输入都到 barrier；非对齐：先落盘再对齐）
+  → SubtaskCheckpointCoordinator → snapshotState（算子 + keyed state + timer）
+  → 状态写入 CheckpointStorage（JM 内存 / 文件系统）
+  → 各 subtask 上报 ack → CheckpointCoordinator 收到全部 ack
+  → 完成：CompletedCheckpointStore 记录，通知算子（两阶段提交的 commit）
+```
+
+重点问题：
+- 精确一次是怎么保证的？barrier 对齐到底对齐了什么？
+- 非对齐 checkpoint（unaligned）解决什么问题，代价是什么？
+- 状态大的时候 checkpoint 慢在哪：快照（RocksDB 增量）/ 上传 / 对齐？
+- 两阶段提交：`CheckpointListener` 的 notifyCheckpointComplete 在什么时候调用，Sink 如何借此实现 exactly-once（这和 Paimon 的 commit 是同一套思路，对照读）。
+- 失败恢复：从哪个 checkpoint 恢复、状态如何重新分配（rescale）。
+
+验收：能画一张完整的 checkpoint 时序图（JM 和 TM 两个泳道），并能解释「checkpoint 一直超时」的五种可能原因分别对应代码哪一段。
+
+## Stage 4：按工作问题二选一深挖（第 5 周）
+
+**方向 A：状态与性能**（如果你们状态大、作业不稳）
+- `StateBackend` / `KeyedStateBackend`：Heap vs RocksDB，状态如何组织（key group、namespace）。
+- 状态 TTL、增量 checkpoint、本地恢复（local recovery）。
+- 数据倾斜：keyBy 之后的分布，`rescale` vs `rebalance` vs `forward`。
+
+**方向 B：Table / SQL 层**（如果你们用 Flink SQL 多）
+- `TableEnvironmentImpl` → `SqlPlanner`/`StreamPlanner` → `StreamPhysicalRel` → `StreamExecNode` → `Transformation`。
+- 一条 `INSERT INTO paimon_table SELECT ...` 怎么变成 JobGraph。
+- 动态表、changelog 语义（+I/-U/+U/-D）在算子间怎么流转——和 Paimon 的 changelog producer 对照。
+- 维表 join / lookup join 的实现。
+
+**方向 C（可选）：时间与窗口**
+- `WatermarkGenerator`、`TimerService`、`WindowOperator`，迟到数据的处理。工作中如果用事件时间，这块必读。
+
+## Stage 5：输出（第 6 周）
+
+写两篇：
+1. 《一个 Flink SQL 作业的一生》：从 SQL 文本到 TaskManager 上跑起来，全链路。
+2. 《我们的作业为什么 checkpoint 慢 / 反压 / 重启》：把工作里的真实案例按代码路径复盘。
+
+## 关键类速查表
+
+| 关注点 | 类 | 模块 |
+| --- | --- | --- |
+| 提交入口 | `CliFrontend`、`StreamExecutionEnvironment` | flink-clients / streaming-java |
+| 图生成 | `StreamGraphGenerator`、`StreamingJobGraphGenerator` | streaming-java |
+| 调度 | `Dispatcher`、`JobMaster`、`DefaultScheduler`、`SlotPool` | flink-runtime |
+| 图执行 | `ExecutionGraph`、`Execution`、`ExecutionVertex` | flink-runtime |
+| 任务执行 | `Task`、`StreamTask`、`OperatorChain` | flink-runtime / streaming-java |
+| 网络 | `ResultPartition`、`InputGate`、`BufferPool`、`RecordWriter` | flink-runtime |
+| Checkpoint | `CheckpointCoordinator`、`CheckpointBarrierHandler`、`SubtaskCheckpointCoordinator` | flink-runtime |
+| 状态 | `StateBackend`、`KeyedStateBackend`、`RocksDBKeyedStateBackend` | flink-runtime / state-backends |
+| Table | `TableEnvironmentImpl`、`StreamPlanner`、`StreamExecNode` | flink-table |
+
+> 版本差异提示：1.20 与 2.0 在 Sink、StreamTask、Table planner 上都有调整，类名以你的版本为准。
+
+## AI 提示词（针对 Flink）
+
+- P2：`从 StreamExecutionEnvironment.execute 开始，追踪一个 WordCount 作业到 TaskManager 上第一个算子开始处理数据，标注每一步运行在 Client / JM / TM 哪个进程。`
+- P3：`解释 barrier 对齐：一个有两路输入的算子，收到一路 barrier 后到另一路 barrier 到来之前，做了什么？数据被缓存到哪？`
+- P4：`对比 Flink 的 checkpoint 和 Paimon 的 snapshot commit，在「谁协调、如何保证原子、失败如何回滚」上的异同。`
+- P8：`设计实验：本地起一个两并行度的作业，人为让一个 subtask 变慢，观察反压指标如何变化，并指出对应代码。`
+
+## 验收问题（能答 80% 算过）
+
+1. StreamGraph / JobGraph / ExecutionGraph 分别是什么，为什么要分三层？
+2. 算子链是怎么形成的？什么情况下不会 chain？
+3. 一个 slot 里能跑哪些 task？slot 不够时作业会怎样？
+4. StreamTask 的 mailbox 模型解决了什么问题？
+5. barrier 对齐的完整过程，非对齐模式的区别？
+6. checkpoint 完成后的通知链路，两阶段提交如何工作？
+7. 反压的指标怎么看，逐级传导的机制是什么？
+8. 作业失败后从哪里恢复？状态如何重新分配？
+9. 一条 Flink SQL 怎么变成 JobGraph？
+10. 「checkpoint 一直失败」的排查顺序是什么（按代码路径）？
+
+## 常见坑
+
+- 直接读 `flink-runtime` 的网络栈或 `flink-table` 的 planner，会崩。必须按 Stage 顺序。
+- 忽略「线程」维度。Flink 大量逻辑是异步、回调、mailbox 驱动的，不标线程会读成一团。
+- 1.13 之前的博客和源码结构差异巨大（尤其是 StreamTask 和 Source），别拿老资料对照新代码。
+- Table 层的类名几经重构（`ExecNode` → `StreamExecNode`，planner 拆分），AI 很容易给出旧版本类名，务必核对。
+</script>
+
+<script type="text/markdown" data-path="02-路线图/04-Spark源码阅读路线.md" data-title="Spark 源码阅读路线（按需，2 周起）" data-weeks="W17">
+# Spark 源码阅读路线（按需，2 周起）
+
+> 仓库：apache/spark（Scala）。版本建议和你们生产一致（3.5.x 或 4.x）。
+> **这条路线的定位是「按需」**：如果 Spark 在你的工作里主要是「跑批 + 读 Paimon 的另一个引擎」，读完 Stage 1、2 就够；只有要做查询优化、排查 OOM/倾斜时才往下走。
+
+## 先定目标：你读 Spark 是为了什么
+
+三种典型目标，读法完全不同：
+
+- **A. 会用 + 能看懂执行计划**（大多数数据开发）：Stage 1 + Stage 2 的物理计划部分，会看 `explain` 输出即可。
+- **B. 排查性能问题**（倾斜、OOM、shuffle 慢）：Stage 1 + Stage 3（AQE、shuffle、内存），配合 Stage 4 的 Paimon 集成。
+- **C. 做引擎改造 / 深度定制**（扩展 Catalyst、写 connector）：全读，重点是 Stage 2 的 Rule 机制和 Stage 4 的 DataSourceV2。
+
+先选一个，别贪。
+
+## 前置知识
+
+- Scala 的 case class、模式匹配、隐式转换（读 Catalyst 必需，`TreeNode` 大量用隐式）。
+- 知道 logical plan / physical plan 的区别。
+- 知道 shuffle 是什么、为什么贵。
+
+## Stage 1：一条 SQL 的一生（3 天）
+
+这是 Spark 最优雅的部分，一条链讲清楚整个引擎：
+
+```
+SQL 文本 / DataFrame API
+  → Unresolved LogicalPlan（Parser / Dataset 构建）
+  → Analyzer（SessionCatalog 解析表、列、函数，变成 Resolved LogicalPlan）
+  → Optimizer（规则批量改写：谓词下推、列裁剪、常量折叠、join 重排）
+  → SparkPlanner（Strategy 把逻辑算子转成物理算子）
+  → PhysicalPlan（可选：AQE 在运行时改写）
+  → SparkPlan.execute / doExecute（WholeStageCodegen 生成字节码）
+  → RDD → Task → Shuffle / 读文件
+```
+
+配套概念：`TreeNode`（一切皆树）、`RuleExecutor`（一批 Rule 反复执行直到不动）、`Strategy`（逻辑到物理的映射）。
+
+验收：给一条带 join + 聚合的 SQL，能说出 Analyzer 和 Optimizer 大致改了哪些地方，并能在 `explain(true)` 输出里指出对应的节点。
+
+## Stage 2：Catalyst 的读法（3-4 天）
+
+**不要试图读完所有 rule**（几百条）。读法：
+
+1. 先读 `RuleExecutor` 和 `Batch` 的执行模型（一次 batch 内规则顺序执行，直到 fixpoint 或达到 maxIterations）。
+2. 挑 5 条最常用的 rule 精读，每条按「匹配什么 → 改成什么 → 为什么安全」三段式做笔记：
+   - `ResolveRelations`（表名 → 表）
+   - `PushDownPredicates` / `PushPredicateThroughJoin`（谓词下推）
+   - `ColumnPruning`（列裁剪）
+   - `ConstantFolding`（常量折叠）
+   - `ReorderJoin` 或 `CostBasedJoinReorder`（join 顺序）
+3. 每条 rule 都问：它会不会不触发？什么情况下触发不了（比如 UDF 挡住了下推）？
+
+进阶（目标 C 才需要）：`TreeNode.transformDown` / `transformUp` 的差异，自定义 rule 怎么注入（`SparkSessionExtensions`）。
+
+## Stage 3：运行时（3-5 天，目标 B 必读）
+
+- **Shuffle**：`ShuffleManager` → `SortShuffleWriter`（map 端排序 + spill）→ 索引文件 → `BlockStoreShuffleReader`（reduce 端拉取）。搞懂 spill 什么时候发生、`spark.shuffle.file.buffer` 之类的参数作用在哪。
+- **AQE**：`AdaptiveSparkPlanExec` 在 stage 边界重新优化；`CoalesceShufflePartitions`（合并小分区）、`OptimizeSkewedJoin`（倾斜 join 拆分）、`DemoteBroadcastHashJoin`。这是解决倾斜和分区过多的主要手段。
+- **内存与 Tungsten**：`UnsafeRow`（堆外二进制行）、`MemoryManager`（execution vs storage）、OOM 时的内存分布。解释了「为什么 off-heap 也会 OOM」。
+- **WholeStageCodegen**：`WholeStageCodegenExec` 把多个算子编译成一个函数，解释了为什么 `explain` 里看到的节点和实际执行不对应。
+
+## Stage 4：Paimon 集成（2-3 天，和工作直接相关）
+
+Paimon 走 Spark 的 DataSourceV2 API，读这条链能同时学会两件事：Spark 怎么接外部存储、Paimon 怎么适配引擎。
+
+```
+SparkCatalog / SparkSession → Table(SparkTable)
+  → ScanBuilder → Scan（做分区裁剪、谓词下推、列裁剪）
+  → Batch → PartitionReaderFactory → PartitionReader（读 Paimon 文件）
+写入：WriteBuilder → BatchWrite → Commit
+```
+
+对照读 `paimon-spark` 和 `paimon-core`：适配层做了什么、哪些能力（下推、统计信息）是 Paimon 提供、哪些是 Spark 要求实现的。**这一节读完，你对「湖格式如何服务多引擎」会有完整认知。**
+
+## 关键类速查表
+
+| 关注点 | 类 | 模块 |
+| --- | --- | --- |
+| 入口 | `SparkSession`、`Dataset`、`QueryExecution` | sql/core |
+| 解析与优化 | `Analyzer`、`Optimizer`、`RuleExecutor`、`Batch` | catalyst |
+| 树 | `TreeNode`、`LogicalPlan`、`Expression` | catalyst |
+| 规划 | `SparkPlanner`、`Strategy`、`SparkPlan` | sql/core |
+| 代码生成 | `WholeStageCodegenExec`、`CodegenContext` | sql/core |
+| AQE | `AdaptiveSparkPlanExec`、`CoalesceShufflePartitions`、`OptimizeSkewedJoin` | sql/core |
+| Shuffle | `ShuffleManager`、`SortShuffleWriter`、`BlockStoreShuffleReader` | core |
+| 内存 | `UnsafeRow`、`MemoryManager`、`TaskMemoryManager` | core |
+| 外部数据源 | `Table`、`ScanBuilder`、`Batch`、`PartitionReaderFactory` | sql/core (v2) |
+
+## AI 提示词（针对 Spark）
+
+- P2：`从 SparkSession.sql("<SQL>") 开始，追踪到生成 PhysicalPlan，列出经过的 Analyzer batch、Optimizer batch、Planner strategy。`
+- P3：`解释 RuleExecutor 的执行模型：batch 之间和 batch 内部的顺序、fixpoint 判定、maxIterations 的作用。`
+- P4：`对比 Spark 的 AQE 和 Flink 的动态调度，在「运行时改计划/改并行度」上的思路差异。`
+- P8：`设计实验：构造一个 10 万行小表 join 1000 万行大表、且 key 严重倾斜的场景，观察 AQE 的 OptimizeSkewedJoin 是否生效，看日志里哪个关键字。`
+
+## 验收问题（能答 80% 算过）
+
+1. 一条 SQL 从文本到执行经过哪几个阶段？每个阶段的输入输出是什么？
+2. `TreeNode` + `Rule` 的模式解决了什么问题？为什么规则要反复执行？
+3. 谓词下推在什么情况下失效？
+4. AQE 在哪些时机重新优化？解决了哪三类问题？
+5. shuffle 的 map 端和 reduce 端分别做了什么？spill 何时发生？
+6. WholeStageCodegen 为什么能提速？它和 `explain` 的节点是什么关系？
+7. Paimon 的 Spark connector 实现了 DataSourceV2 的哪些接口？分区裁剪在哪做的？
+
+## 常见坑
+
+- Spark 源码是 Scala，隐式转换多，跳转经常跳到奇怪的地方。用 IDEA 时先看方法签名，别被隐式带跑。
+- Catalyst 的 rule 有几百条，读多了会迷失。始终围绕「这条规则改变了哪个节点、为什么安全」。
+- 网上大量 Spark 2.x 的资料（尤其是 DataSource V1），和 3.x/4.x 差异大，注意 `v2` 包。
+- Spark 4.x 有较大改动（ANSI 默认开启、Variant 类型、Spark Connect），如果生产是 3.5，别读 4.x 的代码。
+</script>
+
+<script type="text/markdown" data-path="03-问题清单/工作问题backlog.md" data-title="工作问题 backlog" data-weeks="">
+# 工作问题 backlog
+
+规则：**每条问题都必须来自真实工作**（线上现象、需求、评审争论），不要凭空造。一个问题解决后不删除，补上结论和笔记链接。
+
+状态：`待读` → `在读` → `已解决`。每周一挑一条，周五复盘。
+
+## 问题卡片格式
+
+```
+### Q<n> <一句话问题>
+- 来源：<线上现象 / 需求 / 同事提问>
+- 涉及项目：<Datus / Paimon / Flink / Spark>
+- 想搞清楚：<具体到能验证的程度>
+- 状态：待读
+- 笔记：<链接>
+- 结论：<一句话，解决后填>
+```
+
+## 待办（先按下面的模板替换成你自己的真实问题）
+
+### Q1 Paimon 表写入为什么会出现大量小文件
+- 来源：待补（观察到的现象 / 监控）
+- 涉及项目：Paimon
+- 想搞清楚：小文件产生的具体触发点（checkpoint 间隔？bucket 数？并发 writer？），哪几个配置能控制，compaction 何时介入
+- 状态：待读
+
+### Q2 实时链路里 changelog producer 该选哪种模式
+- 来源：待补
+- 涉及项目：Paimon + Flink
+- 想搞清楚：`none` / `input` / `lookup` / `full-compaction` 四种模式对下游流读的延迟、写入放大的影响，代码里在哪分流
+- 状态：待读
+
+### Q3 作业 checkpoint 偶发超时，根因分层
+- 来源：待补
+- 涉及项目：Flink
+- 想搞清楚：超时发生在「对齐 / 快照 / 上传 / ack」哪一段，怎么用指标和日志区分
+- 状态：待读
+
+### Q4 反压到底卡在哪一级
+- 来源：待补
+- 涉及项目：Flink
+- 想搞清楚：credit-based 流控下，outPoolUsage / inPoolUsage 与算子吞吐的对应关系，如何定位到具体算子
+- 状态：待读
+
+### Q5 状态越来越大，RocksDB 增量 checkpoint 有没有生效
+- 来源：待补
+- 涉及项目：Flink
+- 想搞清楚：增量 checkpoint 的触发条件和限制（版本、配置、state backend 类型）
+- 状态：待读
+
+### Q6 Paimon 主键表点查为什么慢
+- 来源：待补
+- 涉及项目：Paimon
+- 想搞清楚：读时合并的文件数、lookup 缓存命中、bucket 设计与读放大
+- 状态：待读
+
+### Q7 同一个 Paimon 表，Flink 和 Spark 读出来的结果是否一致
+- 来源：待补
+- 涉及项目：Paimon + Spark
+- 想搞清楚：两个引擎在读路径上的差异（merge-on-read 的实现、过滤下推），什么情况下会不一致
+- 状态：待读
+
+### Q8 Spark 任务倾斜，AQE 为什么没救回来
+- 来源：待补
+- 涉及项目：Spark
+- 想搞清楚：`OptimizeSkewedJoin` 的生效条件，哪些写法会绕过它
+- 状态：待读
+
+### Q9 我们的数据问答 Agent 为什么答不准
+- 来源：待补
+- 涉及项目：Datus（对照自己的实现）
+- 想搞清楚：Datus 的上下文构建和检索策略，和我们现在做法差在哪
+- 状态：待读
+
+### Q10 如果要给公司内部做一个 Text2SQL，Datus 有哪些能直接复用
+- 来源：待补
+- 涉及项目：Datus
+- 想搞清楚：可复用的模块（context、工具层、校验重试），不可复用的部分（绑定的存储/UI）
+- 状态：待读
+
+## 已解决
+
+（解决后把卡片移到这里，保留结论，方便以后回看。）
+</script>
+
+<script type="text/markdown" data-path="04-笔记/README.md" data-title="04-笔记" data-weeks="">
+# 04-笔记
+
+一篇一个主题，文件名格式：`<项目>-<主题>.md`。
+
+命名示例：
+
+- `datus-一问一答链路.md`
+- `datus-context构建.md`
+- `paimon-写入与提交链路.md`
+- `paimon-compaction机制.md`
+- `flink-作业提交链路.md`
+- `flink-checkpoint全链路.md`
+- `spark-sql生命周期.md`
+- `对比-paimon-snapshot-vs-flink-checkpoint.md`
+
+每篇都用 `01-方法论/笔记模板.md`，写完跑一遍提示词 P9 再标「已验证」。
+
+进度看这里（每写完一篇更新一次）：
+
+| 项目 | 笔记 | 状态 |
+| --- | --- | --- |
+| LangChain / LangGraph | | |
+| Datus | | |
+| Paimon | | |
+| Flink | | |
+| Spark | | |
+</script>
+
+<!--DOCS-->
 
 <script>
-  document.querySelectorAll('button.folder').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var id = btn.getAttribute('data-folder');
-      var collapsed = btn.classList.toggle('collapsed');
-      btn.setAttribute('aria-expanded', String(!collapsed));
-      document.querySelectorAll('[data-parent="' + id + '"]').forEach(function (child) {
-        child.hidden = collapsed;
-      });
+(function () {
+  'use strict';
+
+  /* ---------------- markdown renderer ---------------- */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function isCjk(ch) {
+    return /[\u2E80-\u9FFF\uF900-\uFAFF\u3000-\u303F\uFF00-\uFFEF]/.test(ch);
+  }
+
+  function joinText(lines) {
+    if (!lines.length) return '';
+    var s = lines[0];
+    for (var k = 1; k < lines.length; k++) {
+      var a = s.slice(-1);
+      var b = lines[k].charAt(0);
+      s += (isCjk(a) || isCjk(b) ? '' : ' ') + lines[k];
+    }
+    return s;
+  }
+
+  function inline(s) {
+    var segs = String(s).split('`');
+    var out = '';
+    for (var i = 0; i < segs.length; i++) {
+      if (i % 2 === 1) {
+        out += '<code>' + esc(segs[i]) + '</code>';
+        continue;
+      }
+      var t = esc(segs[i]);
+      t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      t = t.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+      out += t;
+    }
+    return out;
+  }
+
+  function isSep(line) {
+    var t = line.trim().replace(/^\|/, '').replace(/\|$/, '');
+    if (t.indexOf('-') === -1) return false;
+    return t.split('|').every(function (c) {
+      return /^\s*:?-{2,}:?\s*$/.test(c);
     });
+  }
+  function splitRow(line) {
+    var t = line.trim();
+    if (t.charAt(0) === '|') t = t.slice(1);
+    if (t.slice(-1) === '|') t = t.slice(0, -1);
+    return t.split('|').map(function (c) { return c.trim(); });
+  }
+
+  var LIST_RE = /^(\s*)([-*+]|\d+[.)])\s+(.*)$/;
+
+  function renderNodes(nodes) {
+    var html = '';
+    var i = 0;
+    while (i < nodes.length) {
+      var t = nodes[i].ordered ? 'ol' : 'ul';
+      var j = i;
+      while (j < nodes.length && (nodes[j].ordered ? 'ol' : 'ul') === t) j++;
+      html += '<' + t + '>';
+      for (var k = i; k < j; k++) {
+        var txt = nodes[k].text;
+        var box = '';
+        var cm = txt.match(/^\[( |x|X)\]\s+(.*)$/);
+        if (cm) { box = '<span class="chk"></span>'; txt = cm[2]; }
+        html += '<li>' + box + inline(txt);
+        if (nodes[k].children.length) html += renderNodes(nodes[k].children);
+        html += '</li>';
+      }
+      html += '</' + t + '>';
+      i = j;
+    }
+    return html;
+  }
+
+  function listBlock(lines, start) {
+    var items = [];
+    var i = start;
+    while (i < lines.length) {
+      var l = lines[i];
+      var m = l.match(LIST_RE);
+      if (m) {
+        items.push({
+          indent: m[1].replace(/\t/g, '    ').length,
+          ordered: /^\d/.test(m[2]),
+          text: m[3]
+        });
+        i++;
+        continue;
+      }
+      if (/^\s{2,}\S/.test(l) && items.length) {
+        var last = items[items.length - 1];
+        last.text = joinText([last.text, l.trim()]);
+        i++;
+        continue;
+      }
+      if (/^\s*$/.test(l)) {
+        var j = i + 1;
+        while (j < lines.length && /^\s*$/.test(lines[j])) j++;
+        if (j < lines.length && (LIST_RE.test(lines[j]) || /^\s{2,}\S/.test(lines[j]))) {
+          i = j;
+          continue;
+        }
+        break;
+      }
+      break;
+    }
+
+    var root = { indent: -1, children: [] };
+    var stack = [root];
+    items.forEach(function (it) {
+      while (stack.length > 1 && it.indent <= stack[stack.length - 1].indent) stack.pop();
+      var node = { indent: it.indent, ordered: it.ordered, text: it.text, children: [] };
+      stack[stack.length - 1].children.push(node);
+      stack.push(node);
+    });
+    return { html: renderNodes(root.children), next: i };
+  }
+
+  function renderBlocks(src) {
+    var lines = src.split(/\r?\n/);
+    var out = '';
+    var i = 0;
+
+    function startsBlock(l) {
+      if (/^\s*$/.test(l)) return true;
+      if (/^#{1,6}\s/.test(l)) return true;
+      if (/^\s*(`{3,}|~{3,})/.test(l)) return true;
+      if (/^\s*>/.test(l)) return true;
+      if (LIST_RE.test(l)) return true;
+      if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(l)) return true;
+      return false;
+    }
+
+    while (i < lines.length) {
+      var line = lines[i];
+      if (/^\s*$/.test(line)) { i++; continue; }
+
+      var fm = line.match(/^(\s*)(`{3,}|~{3,})(.*)$/);
+      if (fm) {
+        var ch = fm[2].charAt(0);
+        var closeRe = new RegExp('^\\s*' + (ch === '`' ? '`' : '~') + '{' + fm[2].length + ',}\\s*$');
+        var buf = [];
+        var j = i + 1;
+        while (j < lines.length && !closeRe.test(lines[j])) { buf.push(lines[j]); j++; }
+        out += '<pre><code>' + esc(buf.join('\n')) + '</code></pre>';
+        i = j + 1;
+        continue;
+      }
+
+      var hm = line.match(/^(#{1,6})\s+(.+?)\s*$/);
+      if (hm) {
+        var n = hm[1].length;
+        out += '<h' + n + '>' + inline(hm[2]) + '</h' + n + '>';
+        i++;
+        continue;
+      }
+
+      if (/^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)) { out += '<hr>'; i++; continue; }
+
+      if (/^\s*>/.test(line)) {
+        var qbuf = [];
+        while (i < lines.length && /^\s*>/.test(lines[i])) {
+          qbuf.push(lines[i].replace(/^\s*>\s?/, ''));
+          i++;
+        }
+        out += '<blockquote>' + renderBlocks(qbuf.join('\n')) + '</blockquote>';
+        continue;
+      }
+
+      if (line.indexOf('|') !== -1 && i + 1 < lines.length && isSep(lines[i + 1])) {
+        var head = splitRow(line);
+        var rows = [];
+        var k2 = i + 2;
+        while (k2 < lines.length && lines[k2].indexOf('|') !== -1 && !/^\s*$/.test(lines[k2])) {
+          rows.push(splitRow(lines[k2]));
+          k2++;
+        }
+        out += '<div class="tw"><table><thead><tr>' +
+          head.map(function (c) { return '<th>' + inline(c) + '</th>'; }).join('') +
+          '</tr></thead><tbody>';
+        rows.forEach(function (r) {
+          out += '<tr>' + r.map(function (c) { return '<td>' + inline(c) + '</td>'; }).join('') + '</tr>';
+        });
+        out += '</tbody></table></div>';
+        i = k2;
+        continue;
+      }
+
+      if (LIST_RE.test(line)) {
+        var res = listBlock(lines, i);
+        out += res.html;
+        i = res.next;
+        continue;
+      }
+
+      var pbuf = [line];
+      i++;
+      while (i < lines.length) {
+        var nl = lines[i];
+        if (startsBlock(nl)) break;
+        if (nl.indexOf('|') !== -1 && i + 1 < lines.length && isSep(lines[i + 1])) break;
+        pbuf.push(nl);
+        i++;
+      }
+      out += '<p>' + inline(joinText(pbuf)) + '</p>';
+    }
+    return out;
+  }
+
+  function render(md) {
+    var lines = md.split(/\r?\n/);
+    var s = 0;
+    while (s < lines.length && /^\s*$/.test(lines[s])) s++;
+    if (s < lines.length && /^#\s+/.test(lines[s])) lines.splice(s, 1);
+    return renderBlocks(lines.join('\n'));
+  }
+
+  /* ---------------- app ---------------- */
+  var scripts = Array.prototype.slice.call(
+    document.querySelectorAll('script[type="text/markdown"]')
+  );
+  var byPath = {};
+  var order = [];
+  scripts.forEach(function (sc) {
+    byPath[sc.getAttribute('data-path')] = sc;
+    order.push(sc.getAttribute('data-path'));
   });
+
+  var docEl = document.getElementById('doc');
+  var topPath = document.getElementById('topPath');
+  var extLink = document.getElementById('extLink');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var mainEl = document.getElementById('main');
+  var side = document.getElementById('side');
+  var overlay = document.getElementById('overlay');
+  var navToggle = document.getElementById('navToggle');
+
+  function shortTitle(sc) {
+    return sc.getAttribute('data-title') || sc.getAttribute('data-path');
+  }
+
+  function open(path, pushHash) {
+    var sc = byPath[path] || byPath['README.md'];
+    var p = sc.getAttribute('data-path');
+    var weeks = sc.getAttribute('data-weeks') || '';
+
+    docEl.innerHTML = '';
+    var h1 = document.createElement('h1');
+    h1.textContent = shortTitle(sc);
+    docEl.appendChild(h1);
+
+    var meta = document.createElement('p');
+    meta.className = 'doc-meta';
+    meta.innerHTML = '<span>' + esc(p) + '</span>' +
+      (weeks ? '<span class="weeks">' + esc(weeks) + '</span>' : '');
+    docEl.appendChild(meta);
+
+    var body = document.createElement('div');
+    body.innerHTML = render(sc.textContent);
+    docEl.appendChild(body);
+
+    topPath.textContent = p;
+    extLink.href = encodeURI(p);
+    document.title = shortTitle(sc) + ' · AI读源码';
+
+    var idx = order.indexOf(p);
+    var items = document.querySelectorAll('.sitem');
+    for (var i = 0; i < items.length; i++) {
+      var on = items[i].getAttribute('data-doc') === p;
+      items[i].classList.toggle('active', on);
+      if (on) items[i].setAttribute('aria-current', 'page');
+      else items[i].removeAttribute('aria-current');
+    }
+
+    if (idx > 0) {
+      prevBtn.disabled = false;
+      prevBtn.textContent = '← ' + shortTitle(byPath[order[idx - 1]]);
+      prevBtn.onclick = function () { open(order[idx - 1], true); };
+    } else {
+      prevBtn.disabled = true;
+      prevBtn.textContent = '';
+    }
+    if (idx !== -1 && idx < order.length - 1) {
+      nextBtn.disabled = false;
+      nextBtn.textContent = shortTitle(byPath[order[idx + 1]]) + ' →';
+      nextBtn.onclick = function () { open(order[idx + 1], true); };
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.textContent = '';
+    }
+
+    if (pushHash) location.hash = encodeURIComponent(p);
+    mainEl.scrollTop = 0;
+    closeNav();
+  }
+
+  function currentHash() {
+    try { return decodeURIComponent(location.hash.replace(/^#/, '')); }
+    catch (e) { return ''; }
+  }
+
+  function openNav() {
+    side.classList.add('open');
+    overlay.classList.add('show');
+    navToggle.setAttribute('aria-expanded', 'true');
+  }
+  function closeNav() {
+    side.classList.remove('open');
+    overlay.classList.remove('show');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  navToggle.addEventListener('click', function () {
+    if (side.classList.contains('open')) closeNav(); else openNav();
+  });
+  overlay.addEventListener('click', closeNav);
+
+  Array.prototype.forEach.call(document.querySelectorAll('.sitem'), function (b) {
+    b.addEventListener('click', function () { open(b.getAttribute('data-doc'), true); });
+  });
+
+  window.addEventListener('hashchange', function () {
+    var p = currentHash();
+    if (p && p !== topPath.textContent) open(p, false);
+  });
+
+  var initial = currentHash();
+  open(initial || 'README.md', !initial);
+})();
 </script>
 </body>
 </html>
