@@ -1,7 +1,7 @@
 # Paimon 源码阅读路线（4-5 周）
 
-> 仓库：apache/paimon（Java）。建议从 `paimon-1.2` 或你生产环境对应的版本开始，先把版本号写死在笔记顶部。
-> Paimon 的代码结构非常规整：`paimon-core` 是主体，`paimon-flink` / `paimon-spark` 是引擎适配。
+> 仓库：apache/paimon（Java）。锁定 `release-1.4.2`（commit `ac223f4`，见 `00-版本锁定.md`），先把版本号写死在笔记顶部。
+> 与 Flink 1.20.5 搭配使用 `paimon-flink-1.20` 模块；Paimon 的代码结构非常规整：`paimon-core` 是主体，`paimon-flink` / `paimon-spark` 是引擎适配。
 
 ## 为什么第二个读它
 

@@ -2,6 +2,7 @@
 
 > 定位：不是把 `Langchain1.0-Langgraph1.0-Learning-main` 的教程再刷一遍，而是补上「基础」和「提高」之间的三段差距——抽象层、运行时、工程化。
 > 这一阶段同时是读 Datus 的热身：你在这里读懂了 LangGraph 的运行时，读 Datus 时才有对照物。
+> 版本锚定：`langchain==1.3.9`、`langchain-core==1.4.9`、`langgraph==1.2.16`（锁定原因与切换命令见 `00-版本锁定.md`）。
 
 ## 先诊断：基础薄弱通常缺的是这三样
 
@@ -27,7 +28,7 @@
 
 ## Stage 2（第 2 周）：LangGraph 运行时
 
-这是最重要的一周。LangGraph 1.0 是 LangChain 1.0 的运行时底座，读懂它，`create_agent` 和 middleware 就都是「上面的糖」。
+这是最重要的一周。LangGraph 1.2 是 LangChain 1.3 的运行时底座，读懂它，`create_agent` 和 middleware 就都是「上面的糖」。
 
 **按这条线读**：
 
@@ -89,4 +90,4 @@ StateGraph（图定义）
 - **不要重刷教程**。看视频和抄示例会产生「会了」的错觉，主动回忆才会暴露真实水平。
 - **不要试图读完 langchain-core**。它是巨型库，只读上面列的三个文件，其余用到再看。
 - **不要跳过 trace**。LangGraph 是异步、批量、并发的，光看代码很难建立时序感，trace 能直接给你真实执行顺序。
-- LangChain 1.0 的 middleware 是新东西，网上资料少，读源码时以 `langchain/agents/middleware/` 为准。
+- LangChain 1.x 的 middleware 是新东西，网上资料少，读源码时以 `langchain/agents/middleware/` 为准。

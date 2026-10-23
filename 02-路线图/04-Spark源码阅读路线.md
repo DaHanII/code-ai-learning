@@ -1,6 +1,6 @@
 # Spark 源码阅读路线（按需，2 周起）
 
-> 仓库：apache/spark（Scala）。版本建议和你们生产一致（3.5.x 或 4.x）。
+> 仓库：apache/spark（Scala）。锁定 `v3.5.9`（commit `7c14a3c`，Scala 2.12 预编译包，见 `00-版本锁定.md`；Paimon 侧对应 `paimon-spark-3.5`）。
 > **这条路线的定位是「按需」**：如果 Spark 在你的工作里主要是「跑批 + 读 Paimon 的另一个引擎」，读完 Stage 1、2 就够；只有要做查询优化、排查 OOM/倾斜时才往下走。
 
 ## 先定目标：你读 Spark 是为了什么

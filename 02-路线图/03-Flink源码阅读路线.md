@@ -1,6 +1,6 @@
 # Flink 源码阅读路线（5-6 周）
 
-> 仓库：apache/flink（Java）。读之前先确定你的目标版本（生产用的 1.18/1.20，或 2.x），不同版本 API 差异不小，尤其 `SinkV2`、`StreamTask`、Table 层。
+> 仓库：apache/flink（Java）。锁定 `release-1.20.5`（commit `0980485`，保守线，见 `00-版本锁定.md`）；若要迁到 2.x，先按 P10 补差异。不同版本 API 差异不小，尤其 `SinkV2`、`StreamTask`、Table 层。
 > **只读三个模块**：`flink-runtime`、`flink-streaming-java`、`flink-table`。其余（connectors、kubernetes、python、ml）一概不看。
 
 ## 为什么第三个读
