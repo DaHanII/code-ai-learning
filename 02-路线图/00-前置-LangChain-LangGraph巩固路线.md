@@ -1,5 +1,7 @@
 # LangChain / LangGraph 巩固提高路线（3 周）
 
+> 状态：旧版固定周次资料，现仅按需参考。文中的“第 N 周”、必交产出和统一排期不再是当前任务；请以 [AI Agent 学习主线](../02-路线图/00-总路线图.md) 为准。
+
 > 定位：不是把 `Langchain1.0-Langgraph1.0-Learning-main` 的教程再刷一遍，而是补上「基础」和「提高」之间的三段差距——抽象层、运行时、工程化。
 > 这一阶段同时是读 Datus 的热身：你在这里读懂了 LangGraph 的运行时，读 Datus 时才有对照物。
 > 版本锚定：`langchain==1.3.9`、`langchain-core==1.4.9`、`langgraph==1.2.16`（锁定原因与切换命令见 `00-版本锁定.md`）。
