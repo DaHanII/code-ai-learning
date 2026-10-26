@@ -1,4 +1,6 @@
-# Paimon 源码阅读路线（4-5 周）
+# Paimon 源码阅读指南（第 10–14 周）
+
+> 统一排期见 [总学习计划](00-总路线图.md)。将前面的订单、支付、退款和维度模型迁移至湖表，复用 SQL 基线验证读写与更新。
 
 > 仓库：apache/paimon（Java）。锁定 `release-1.4.2`（commit `ac223f4`，见 `00-版本锁定.md`），先把版本号写死在笔记顶部。
 > 与 Flink 1.20.5 搭配使用 `paimon-flink-1.20` 模块；Paimon 的代码结构非常规整：`paimon-core` 是主体，`paimon-flink` / `paimon-spark` 是引擎适配。
@@ -13,7 +15,7 @@
 - 列式文件格式的常识（ORC/Parquet 的 row group、stripe）。
 - 知道 Flink 的 checkpoint 是什么（不用懂实现）。
 
-## Stage 1：概念模型（第 1 周）
+## Stage 1：概念模型（第 10 周）
 
 **这一周不读实现，只读概念。** 读官方文档的 Concepts 章节 + `paimon-core` 里的模型类。
 
@@ -34,7 +36,7 @@ Table（表定义 + Schema）
 
 验收：能在纸上画出「表 → snapshot → manifest → data file」的关系，并解释为什么要三层（为什么不把文件列表直接放在 snapshot 里）。
 
-## Stage 2：写链路（第 2 周）
+## Stage 2：写链路（第 11 周）
 
 主链路（Flink 写入一张主键表）：
 
@@ -57,7 +59,7 @@ Flink Sink → TableWrite → BatchWrite → 写文件 + 收集元数据
 - bucket 数量怎么影响写入并行度和读放大？
 - `bucket = -1`（dynamic bucket）和固定 bucket 的差别在哪？
 
-## Stage 3：读链路（第 3 周）
+## Stage 3：读链路（第 12 周）
 
 ```
 TableScan → FileStoreScan（按 snapshot + 分区/过滤条件筛 manifest）
@@ -73,7 +75,7 @@ TableScan → FileStoreScan（按 snapshot + 分区/过滤条件筛 manifest）
 
 验收：能解释「查一条主键最新值」为什么可能读多个文件，以及什么情况下会退化成全表扫。
 
-## Stage 4：专题（第 4 周，按工作问题挑 2-3 个）
+## Stage 4：专题（第 13 周，按工作问题挑 1 个，其余选读）
 
 - **Compaction**：谁触发（Flink 里的 compact 算子 / 独立 compact 作业 / 写时触发）、合并策略（minor/major、full compaction）、和 snapshot 的关系、为什么 compaction 会拖慢写入。
 - **Changelog Producer**：`none` / `input` / `lookup` / `full-compaction` 四种模式的实现差异，对流读的影响。**这是你们做实时链路时最容易踩坑的地方。**
@@ -82,7 +84,7 @@ TableScan → FileStoreScan（按 snapshot + 分区/过滤条件筛 manifest）
 - **Z-order / 排序**：多维聚簇的实现，读 `ZOrderUDF` 一类的东西。
 - **Spark 集成**：`paimon-spark` 的 Scan/Write 怎么复用 core，DataSourceV2 的接口在哪实现。
 
-## Stage 5：回填工作（第 5 周）
+## Stage 5：回填工作（第 14 周）
 
 写一篇《我们的 Paimon 表该怎么建》实践笔记，包含：分区键/主键/桶数的选择依据（引用代码里 bucket 影响读放大的地方）、compaction 配置建议、changelog 模式选择、监控指标清单。这篇笔记要能直接给团队用。
 

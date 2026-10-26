@@ -1,11 +1,13 @@
-# Flink 源码阅读路线（5-6 周）
+# Flink 源码阅读指南（第 15–20 周）
+
+> 统一排期见 [总学习计划](00-总路线图.md)。围绕同一支付/退款案例检查流式更新、去重、迟到、恢复与 Paimon 提交。
 
 > 仓库：apache/flink（Java）。锁定 `release-1.20.5`（commit `0980485`，保守线，见 `00-版本锁定.md`）；若要迁到 2.x，先按 P10 补差异。不同版本 API 差异不小，尤其 `SinkV2`、`StreamTask`、Table 层。
 > **只读三个模块**：`flink-runtime`、`flink-streaming-java`、`flink-table`。其余（connectors、kubernetes、python、ml）一概不看。
 
-## 为什么第三个读
+## 为什么在 Paimon 之后学习
 
-Flink 是这四个里最大的坑，也是最容易半途而废的。放在 Paimon 之后读，是因为你已经理解「快照」这套语义，Flink 的 checkpoint 会顺很多；而做完前两个项目，你的阅读方法也已经成熟。
+Flink 涉及跨进程、跨线程的运行时，是这条计划中需要持续投入的部分。放在 Paimon 之后读，是因为你已经理解「快照」这套语义，Flink 的 checkpoint 会顺很多；而完成前面的框架、Agent 与湖表学习后，你的阅读方法也已经成熟。
 
 ## 先建立一个心法：永远先问「这段代码跑在哪个进程、哪个线程」
 
@@ -17,7 +19,7 @@ Flink 的代码难，难在跨进程、跨线程的状态。读每个方法前�
 
 笔记里每个方法都标上「JM / TM / Client」，链路表里加一列「线程」。这一列比任何注释都有用。
 
-## Stage 1：作业提交链路（第 1-2 周）
+## Stage 1：作业提交链路（第 15–16 周）
 
 从 `flink-examples` 的 WordCount 出发，追一条链：
 
@@ -44,7 +46,7 @@ CliFrontend.main
 
 验收：能画出四种图的转换关系，并解释每一步转换解决了什么问题。
 
-## Stage 2：任务执行与数据交换（第 3 周）
+## Stage 2：任务执行与数据交换（第 17 周）
 
 ```
 Task.run → StreamTask.invoke
@@ -61,7 +63,7 @@ Task.run → StreamTask.invoke
 
 验收：能解释一条记录从上游算子到下游算子经过了哪些缓冲区和线程，以及反压如何逐级传导。
 
-## Stage 3：Checkpoint 全链路（第 4 周，核心中的核心）
+## Stage 3：Checkpoint 全链路（第 18 周，核心中的核心）
 
 这是和 Paimon 对接最紧的部分，也是线上问题最多的部分。
 
@@ -86,7 +88,7 @@ CheckpointCoordinator.triggerCheckpoint（JM 定时器触发）
 
 验收：能画一张完整的 checkpoint 时序图（JM 和 TM 两个泳道），并能解释「checkpoint 一直超时」的五种可能原因分别对应代码哪一段。
 
-## Stage 4：按工作问题二选一深挖（第 5 周）
+## Stage 4：按工作问题二选一深挖（第 19 周）
 
 **方向 A：状态与性能**（如果你们状态大、作业不稳）
 - `StateBackend` / `KeyedStateBackend`：Heap vs RocksDB，状态如何组织（key group、namespace）。
@@ -99,10 +101,11 @@ CheckpointCoordinator.triggerCheckpoint（JM 定时器触发）
 - 动态表、changelog 语义（+I/-U/+U/-D）在算子间怎么流转——和 Paimon 的 changelog producer 对照。
 - 维表 join / lookup join 的实现。
 
-**方向 C（可选）：时间与窗口**
-- `WatermarkGenerator`、`TimerService`、`WindowOperator`，迟到数据的处理。工作中如果用事件时间，这块必读。
+**贯穿案例必做：时间、更新与迟到（第 19–20 周）**
+- 使用支付/退款样例验证事件时间、watermark、重复事件与迟到修正；记录当前值、截止时点与补数规则。
+- 在方向 A/B 只选一个精读的基础上，按案例需要定位 `WatermarkGenerator`、`TimerService` 或 `WindowOperator`；完整时间窗口专题列为选读。
 
-## Stage 5：输出（第 6 周）
+## Stage 5：输出（第 20 周）
 
 写两篇：
 1. 《一个 Flink SQL 作业的一生》：从 SQL 文本到 TaskManager 上跑起来，全链路。
