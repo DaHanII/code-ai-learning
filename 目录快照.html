@@ -341,6 +341,8 @@
       <button class="sitem" data-doc="01-方法论/提示词库.md"><span class="nm">提示词库</span></button>
       <button class="sitem" data-doc="01-方法论/笔记模板.md"><span class="nm">笔记模板</span></button>
 
+      <button class="sitem" data-doc="01-方法论/数据建模与语义建模知识框架.md"><span class="nm">数据建模与语义建模知识框架</span></button>
+
       <p class="group-label">02-路线图</p>
       <button class="sitem" data-doc="02-路线图/00-总路线图.md"><span class="nm">00-总路线图</span><span class="wk">W1–17</span></button>
       <button class="sitem" data-doc="02-路线图/00-版本锁定.md"><span class="nm">00-版本锁定</span></button>
@@ -350,17 +352,19 @@
       <button class="sitem" data-doc="02-路线图/03-Flink源码阅读路线.md"><span class="nm">03-Flink</span><span class="wk">W12–16</span></button>
       <button class="sitem" data-doc="02-路线图/04-Spark源码阅读路线.md"><span class="nm">04-Spark</span><span class="wk">W17</span></button>
 
+      <button class="sitem" data-doc="02-路线图/05-数据建模与Ossie学习路线.md"><span class="nm">05-数据建模与Ossie</span><span class="wk">专题4周</span></button>
+
       <p class="group-label">03-问题清单</p>
       <button class="sitem" data-doc="03-问题清单/工作问题backlog.md"><span class="nm">工作问题backlog</span></button>
 
       <p class="group-label">04-笔记</p>
-      <button class="sitem" data-doc="04-笔记/README.md"><span class="nm">README（空）</span></button>
+      <button class="sitem" data-doc="04-笔记/README.md"><span class="nm">笔记与学习进度</span></button>
     </nav>
 
     <div class="side-foot">
-      13 篇文档，内容已内嵌。<br>
+      15 篇文档，内容已内嵌。<br>
       改动 Markdown 后需重新生成。<br>
-      快照：2026-10-23
+      快照：2026-10-26
     </div>
   </aside>
 
@@ -386,7 +390,7 @@
 
 目标：用 AI 把「读开源项目」变成一条可执行、可验证、能回填工作的流水线，而不是让 AI 替你概括仓库。
 
-先用 3 周把 LangChain / LangGraph 从「会用」补到「会造」，再依次拿下四个仓库：Datus、Apache Paimon、Apache Flink、Apache Spark。全程约 17 周。
+先用 3 周把 LangChain / LangGraph 从「会用」补到「会造」，再依次拿下四个仓库：Datus、Apache Paimon、Apache Flink、Apache Spark。原源码主线约 17 周。新增「数据建模与 Ossie」4 周专题，推荐在 Datus 后串行学习，合计约 21 周；专题每周约 6 小时，详见学习路线。
 
 ## 这个目录怎么用
 
@@ -395,10 +399,12 @@
 | `01-方法论/AI辅助读源码方法论.md` | 第一次开始前通读一遍，之后每月回看一次 |
 | `01-方法论/提示词库.md` | 每次开一个新的阅读会话，从这里复制提示词 |
 | `01-方法论/笔记模板.md` | 每读完一条链路，按模板成文 |
+| [数据建模与语义建模知识框架](01-方法论/数据建模与语义建模知识框架.md) | 梳理业务、逻辑、维度、指标与语义建模的边界 |
 | `02-路线图/00-前置-LangChain-LangGraph巩固路线.md` | 第 1-3 周，先把 LangChain/LangGraph 补到能读源码 |
 | `02-路线图/00-总路线图.md` | 决定这周读哪个项目、读到哪一步 |
 | `02-路线图/00-版本锁定.md` | 开读任何仓库前先看：锁定版本、commit 与切换命令 |
 | `02-路线图/01-Datus源码阅读路线.md` 至 `04-Spark源码阅读路线.md` | 进入某个项目时看 |
+| [数据建模与 Ossie 学习路线](02-路线图/05-数据建模与Ossie学习路线.md) | 4 周、每周约 6 小时，用订单—支付—退款案例完成建模与验证 |
 | `03-问题清单/工作问题backlog.md` | 每周挑一个真实问题作为阅读入口 |
 | `04-笔记/` | 成文的阅读笔记，一篇一个主题 |
 
@@ -416,7 +422,8 @@ AI读源码/
 ├── 01-方法论/
 │   ├── AI辅助读源码方法论.md
 │   ├── 提示词库.md
-│   └── 笔记模板.md
+│   ├── 笔记模板.md
+│   └── 数据建模与语义建模知识框架.md
 ├── 02-路线图/
 │   ├── 00-前置-LangChain-LangGraph巩固路线.md
 │   ├── 00-总路线图.md
@@ -424,7 +431,8 @@ AI读源码/
 │   ├── 01-Datus源码阅读路线.md
 │   ├── 02-Paimon源码阅读路线.md
 │   ├── 03-Flink源码阅读路线.md
-│   └── 04-Spark源码阅读路线.md
+│   ├── 04-Spark源码阅读路线.md
+│   └── 05-数据建模与Ossie学习路线.md
 ├── 03-问题清单/
 │   └── 工作问题backlog.md
 └── 04-笔记/
@@ -750,7 +758,7 @@ L2 的读法是**以状态变化为中心**，不是以文件为中心。读一�
 
 ---
 
-~~~markdown
+```markdown
 # <项目> <主题>
 
 - 版本：<tag / commit>
@@ -814,7 +822,7 @@ sequenceDiagram
 ## 对工作的启发
 
 <配置建议、排查顺序、改造方案。这一节是笔记的价值所在。>
-~~~
+```
 
 ---
 
@@ -825,6 +833,113 @@ sequenceDiagram
 - 「设计取舍」和「对工作的启发」是两节必须写的内容，前者防止只知其然，后者防止读完就忘。
 - 一篇笔记只写一个主题。链路超过 8 跳就拆成两篇。
 - 写完跑一遍 P9，把 AI 挑出的问题处理完再标「已验证」。
+</script>
+
+<script type="text/markdown" data-path="01-方法论/数据建模与语义建模知识框架.md" data-title="数据建模与语义建模知识框架" data-weeks="">
+# 数据建模与语义建模知识框架
+
+> 目标：把业务需求、模型设计、指标口径和 AI 消费串起来，形成可以解释、实现、验证的知识体系。
+> 资料核对日期：2026-10-26。配套执行计划：[数据建模与 Ossie 学习路线](../02-路线图/05-数据建模与Ossie学习路线.md)。
+
+## 1. 为什么学 Ossie，以及学到哪里
+
+Apache Ossie（孵化中，原名 Open Semantic Interchange）主要定义跨 BI、分析与 AI 工具交换语义模型的公共格式。它用 JSON/YAML 表达数据集、字段、关系、指标和 AI 上下文；模型转换器另在 apache/ossie-converters 仓库。
+
+**适合用它学习统一业务语义、指标定义和模型互通；系统学习数据建模时，以业务与维度建模为主线，用 Ossie 表达并检验设计结果。** 阅读顺序是业务问题 → 粒度与关系 → 事实和维度 → 指标合同 → Ossie 表达 → SQL 验证。
+
+项目依据：[README](https://github.com/apache/ossie)、[核心规范](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/core-spec/spec.md)、[转换器](https://github.com/apache/ossie-converters)。
+
+## 2. 分层知识地图
+
+| 层次 | 必须回答的问题 | 核心概念 | 学习产出 |
+| --- | --- | --- | --- |
+| 业务与概念模型 | 谁参与，发生什么，状态如何变化？ | 业务过程、实体、事件、关系、术语边界 | 业务流程图、概念关系图、术语表 |
+| 逻辑模型 | 一行代表什么，怎样唯一标识，什么关系会放大行数？ | 粒度、自然键/代理键、基数、函数依赖、规范化取舍 | 逻辑关系图、主键与关系约束 |
+| 维度模型 | 如何支持分析，如何保留历史？ | 星型模型、三类事实表、一致性维度、角色扮演维、SCD | 总线矩阵、事实/维度清单、历史处理规则 |
+| 指标与语义模型 | 业务术语如何映射到稳定计算口径？ | 度量与指标、聚合、过滤、时间、去重、维度可用范围 | 指标合同、Ossie 模型、业务同义词 |
+| 物理与加工实现 | 如何把逻辑模型落成可维护的数据表？ | 数仓分层、分区、主键更新、CDC、迟到、幂等、性能 | DDL、加工 SQL、更新和补数方案 |
+| 验证与治理 | 如何发现口径错误，如何安全演进？ | 对账、质量约束、血缘、负责人、版本、兼容性 | 样例数据、断言 SQL、变更记录 |
+
+逻辑关系设计与分析模型的目标不同。先理解实体约束，再解释为什么为分析采用星型结构；物理布局与湖表主键设计可回到 Paimon/Flink 主线继续深入。
+
+## 3. 维度建模必须掌握的内容
+
+以 [Kimball 官方技术目录](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/)作为知识索引，按下面顺序总结，每条配一个自己的业务例子：
+
+1. 四步设计：选择业务过程 → 声明粒度 → 确定维度 → 确定事实。
+2. 事实表：事务事实表、周期快照、累积快照；解释为什么支付事件、每日余额、订单履约过程需要不同粒度。
+3. 可加性：金额通常能在约定范围内相加；余额不能直接跨日期相加；比率应重新汇总分子和分母，避免平均百分比。
+4. 维度：自然键与代理键、一致性维度、退化维、日期维和角色扮演维。
+5. 历史：SCD Type 1 覆盖与 Type 2 增行；明确“按交易当时属性”还是“按当前属性”分析。
+6. 多事实分析：支付和退款先各自聚合到共同粒度，再关联；避免直接把两侧明细连在一起后求和。
+7. 工程边界：迟到事实、退款回溯、CDC 重放、去重与补数，怎样改变历史报表。
+
+## 4. 指标合同：先写口径，再写表达式
+
+每个指标至少记录：
+
+| 项目 | 需要写清的内容 |
+| --- | --- |
+| 名称和业务目的 | 同名指标是否存在多个定义，服务什么决策 |
+| 粒度与数据来源 | 输入粒度、输出粒度、源表/字段、关联路径 |
+| 公式 | 分子、分母、去重键、单位、精度与舍入 |
+| 纳入范围 | 成功/失败/取消状态、测试数据、退款是否计入 |
+| 时间 | 事件时间或入仓时间、时区、统计窗口、截止时点 |
+| 维度与历史 | 可用维度，历史属性或当前属性，允许怎样汇总 |
+| 边界行为 | 空值、零分母、负值、重复事件、迟到与补数 |
+| 验证与维护 | 期望结果、对账 SQL、负责人、版本与生效时间 |
+
+例如“客单价”不能只写 AVG(amount)：先明确是订单金额、成功支付金额还是净支付金额，分母是全部订单还是成功支付订单；不同口径应分别命名。
+
+## 5. Ossie 概念与建模结果的映射
+
+| Ossie 元素 | 对应的设计结果 | 需要额外验证的事项 |
+| --- | --- | --- |
+| datasets / source | 逻辑数据集与物理表、视图或查询的映射 | 源数据是否真的符合声明粒度 |
+| primary_key / unique_keys | 数据集唯一标识与候选键 | 声明唯一不代表真实数据没有重复 |
+| fields / datatype / dimension | 字段、逻辑类型与分析维度角色 | 时间字段的值类型与时间角色需分别理解 |
+| relationships | 数据集之间的连接定义 | 关系是否会放大行数、漏掉数据，需用数据验证 |
+| datasets[].metrics / 根级 metrics | 单数据集和跨数据集指标 | 聚合粒度与过滤范围是否符合合同 |
+| description / ai_context | 业务定义、同义词、使用说明与示例问题 | 描述准确性及 AI 是否真正使用这些信息 |
+| custom_extensions | 核心规范以外的厂商信息 | 哪些消费者能理解，往返转换是否保留 |
+
+**锁定版本的重要限制**：核心规范 0.2.0.dev0 中，指标表达式引用已声明的数据集字段，不能直接引用其他指标，也不能绕过字段声明直接引用 source 列。设计派生指标时，先形成业务依赖图，再按该版本允许的表达式或预计算字段实现，不套用其他语义层的语法。
+
+Ossie 校验器会检查 Schema、名字、引用和相应 SQL 语法等问题；**校验通过不等于业务口径正确、数据主键唯一或查询结果正确**。仍需使用独立 SQL 和预期结果对账。
+
+依据：[指标与名称解析规范](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/core-spec/spec.md)、[验证脚本](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/validation/validate.py)。
+
+## 6. 用同一个案例贯穿学习
+
+选择“订单—订单明细—支付—退款—客户—商品”。默认用合成数据练习，真实业务问题另在 backlog 中登记来源。
+
+| 对象 | 示例粒度 | 需要研究的设计问题 |
+| --- | --- | --- |
+| 订单 | 一行一订单 | 下单时间、订单状态、取消订单是否纳入 |
+| 订单明细 | 一行一订单行 | 商品维度；订单级金额怎样分摊，是否具备可靠依据 |
+| 支付 | 一行一支付事件 | 多次支付、成功状态、重复回调、支付时间 |
+| 退款 | 一行一退款事件 | 多次退款、跨日退款、退款归因与截止时间 |
+| 客户维度 | 一行一客户版本 | 业务键、代理键、有效时间区间 |
+| 商品维度 | 一行一商品版本或当前商品 | 历史类目变化按何种口径分析 |
+
+至少区分两种时间视角：订单批次截至某时点的累计净支付，与某个自然日的支付减退款现金流。它们回答不同问题，结果不应强行对齐。
+
+## 7. 与现有源码主线的联系
+
+- Datus：研究业务语义如何进入检索和上下文，比较只有表结构与增加指标定义后的查询结果。是否支持 Ossie 原生导入需要核对锁定版本，不能预设。
+- Paimon：研究主键更新、changelog、snapshot 怎样支撑模型的状态与历史需求；存储主键与业务实体标识需要分别定义。
+- Flink：研究事件时间、watermark、去重与迟到修正怎样影响指标结果。
+- Spark：用批处理对账 SQL 复核指标，学习关联与聚合计划。
+
+## 8. 资料与学习边界
+
+- [Ossie 官方仓库](https://github.com/apache/ossie)：定位、规范和工具入口。
+- [TPC-DS 示例](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/examples/tpcds_semantic_model.yaml)：观察事实、维度、关系和指标的表达。
+- [关系语义](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/core-spec/relational_semantics.md)与[表达式语言](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/core-spec/expression_language.md)：在核心格式之后阅读。
+- [路线图](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/ROADMAP.md)：区分已实现、讨论中和计划中的能力。
+- [Kimball 官方技术目录](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/)：维度建模主线。
+
+Ossie 的 0.2.0.dev0 是开发草案，学习锁定完整 commit；不要把 roadmap 当已实现能力。完整版本与转换器子模块差异见 `02-路线图/00-版本锁定.md`。
 </script>
 
 <script type="text/markdown" data-path="02-路线图/00-总路线图.md" data-title="总路线图" data-weeks="W1–17">
@@ -843,6 +958,21 @@ sequenceDiagram
 全程约 17 周。前 3 周不是热身，是补地基——**LangGraph 没读懂就读 Datus，只能看个热闹**，因为你看不出它哪些地方是照抄运行时、哪些是自己的设计。
 
 各仓库版本已于 2026-10-23 锁定在 `00-版本锁定.md`（Flink 1.20.5 / Paimon 1.4.2 / Spark 3.5.9 / Datus v0.4.3 / LangChain 1.3.9 / LangGraph 1.2.16），读代码和与 AI 对话都以锁定版本为准。
+
+## 数据建模与 Ossie 专题（新增 4 周）
+
+知识框架见 [数据建模与语义建模知识框架](../01-方法论/数据建模与语义建模知识框架.md)，逐周安排与验收见 [数据建模与 Ossie 学习路线](05-数据建模与Ossie学习路线.md)。
+
+| 专题周 | 内容 | 本周产出 |
+| --- | --- | --- |
+| M1 | 业务与逻辑建模、粒度、指标合同 | 业务关系图、粒度表、5 个指标合同 |
+| M2 | 维度建模、事实与维度、SQL 对账 | 星型模型、样例数据、基础与边界断言 |
+| M3 | Ossie 核心规范、模型表达与校验 | YAML 模型、验证记录、验证链路笔记 |
+| M4 | 模型转换、Datus/AI 上下文对照 | 往返差异报告、10 题评估与工作迁移建议 |
+
+默认在 Datus 第 6 周后串行插入，专题占日历第 7–10 周，原主线第 7–17 周顺延 4 周，按原 17 周排期计约 21 周。每周预算约 6 小时。下方保留源码主线的阶段周编号，便于继续引用各项目文档。
+
+也可独立先学 M1–M3，再在 Datus 具备运行条件后补 M4；只有每周另有 6 小时预算时才并行。Ossie 学习以建模设计、规范阅读和结果验证为主，不要求通读全仓。
 
 ## 为什么是这个顺序
 
@@ -926,6 +1056,8 @@ sequenceDiagram
 | 2 | apache/paimon | `release-1.4.2` | commit `ac223f4` |
 | 3 | apache/flink | `release-1.20.5` | commit `0980485` |
 | 4 | apache/spark | `v3.5.9` | commit `7c14a3c`；2026-07-16 发布，Scala 2.12 预编译包 |
+| 专题 | apache/ossie | `0.2.0.dev0` 草案；commit `a498fce5455dcc209605cdbb30b21e47068ff15e` | 2026-10-26 核对；固定提交，不跟随 main |
+| 专题 | apache/ossie-converters | commit `bc4eb5d051dcc1825d90aea7f0c2c4cf89015d3c` | 2026-10-26 核对；子模块见下文 |
 
 为什么不锁路线图原文里的 LangChain 1.0：`langchain<=1.0.8` 全线受 CVE-2026-55443（文件路径穿越，涉及 agent 的文件读写与加载器）影响，官方在 1.3.9 修复。1.3.9 仍属 1.x 保守线，且强制要求 LangGraph `>=1.2.4,<1.3`，所以 LangGraph 一起锁到 1.2.16。
 
@@ -978,6 +1110,27 @@ Paimon 1.4.2 的仓库里带着现成的引擎模块，正好对上锁定的版�
 - Spark 侧用 `paimon-spark-3.5`（模块路径 `paimon-spark/paimon-spark-3.5`）
 
 注意：`release-1.4.2` 没有 Flink 2.3 的适配模块（最高到 2.2），所以**不要**把 Paimon 1.4.2 和 Flink 2.3 混用。JDK 统一用 17，Maven 3.8+。
+
+## Ossie 专题的版本与环境（2026-10-26 新增）
+
+核心规范标注 `0.2.0.dev0`，是未发布开发草案；相同版本字符串不能唯一标识 Schema，必须同时记录 commit。核心阅读与自建模型使用：
+
+```powershell
+# 在 D:\hy\codex\ai-source-learning\ossie-study\upstream 下执行
+git clone https://github.com/apache/ossie.git ossie
+git -C ossie checkout a498fce5455dcc209605cdbb30b21e47068ff15e
+git clone https://github.com/apache/ossie-converters.git ossie-converters
+git -C ossie-converters checkout bc4eb5d051dcc1825d90aea7f0c2c4cf89015d3c
+git -C ossie-converters submodule update --init --recursive
+```
+
+上述转换器提交引用的 `ossie` 子模块是 `7205e15253ae3f340f8f191e978685006f5fa72d`，与核心阅读提交不同。保留转换器配套子模块，按各转换器 README 操作；跨版本交换先比较 Schema，迁移模型副本并记录差异。不要直接替换其子模块为核心阅读版。
+
+核心验证脚本声明 Python >=3.11，依赖声明包含 `jsonschema>=4.26.0`、`pyyaml>=6.0.3`、`sqlglot>=30.12.0`；在专题独立虚拟环境安装并记录实际版本，避免改变阶段 0 / Datus 环境。转换器依赖另按所选目录 README 处理。
+
+本地校验只验证文档与引用等规则；业务数据与指标数值还需独立 SQL 对账。规范、路线图与转换器均按固定提交解读，不把规划中的功能当现成功能。
+
+核对来源：[核心提交](https://github.com/apache/ossie/commit/a498fce5455dcc209605cdbb30b21e47068ff15e)、[转换器提交](https://github.com/apache/ossie-converters/commit/bc4eb5d051dcc1825d90aea7f0c2c4cf89015d3c)、[验证脚本](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/validation/validate.py)。
 
 ## 每次对话的固定前缀
 
@@ -1152,6 +1305,8 @@ StateGraph（图定义）
 
 **专题 1：Context Engineering（最重要）**
 Datus 的核心卖点大概率就在这里。要搞清楚：数据上下文（表结构、字段描述、指标定义、示例 SQL、业务语义）以什么形式存储、怎么检索（向量？关键词？还是结构化索引？）、怎么注入 prompt、怎么随会话演进。这是你能直接搬回工作的部分——你们内部的 Text2SQL 大概率卡在上下文上。
+
+衔接练习：完成本阶段后，可按 [数据建模与 Ossie 学习路线](05-数据建模与Ossie学习路线.md) 做 4 周专题，用固定业务数据比较「仅表结构」与「表结构 + 已验证语义定义」的上下文效果；Ossie 原生导入能力先核对当前 Datus 版本。
 
 **专题 2：Subagent 编排**
 有没有多个角色（如「调研 agent」「SQL agent」「校验 agent」）？它们之间怎么交接？是串行、并行还是路由？和 LangGraph 的 supervisor 模式比，差别在哪、为什么。
@@ -1611,6 +1766,156 @@ SparkCatalog / SparkSession → Table(SparkTable)
 - Spark 4.x 有较大改动（ANSI 默认开启、Variant 类型、Spark Connect），如果生产是 3.5，别读 4.x 的代码。
 </script>
 
+<script type="text/markdown" data-path="02-路线图/05-数据建模与Ossie学习路线.md" data-title="数据建模与 Ossie 学习路线（4 周）" data-weeks="专题 M1–M4">
+# 数据建模与 Ossie 学习路线（4 周）
+
+> 目标：系统总结业务、逻辑、维度和语义建模，用一个可验证的案例把它们连接起来。
+> 时间预算：每周约 6 小时，共约 24 小时；4 周是专题学习时间，不代表穷尽数据建模全部领域。
+> 创建日期：2026-10-26。前置阅读：[知识框架](../01-方法论/数据建模与语义建模知识框架.md)。版本见 [版本锁定](00-版本锁定.md)。
+
+## 1. 如何安排进现有主线
+
+推荐排在 Datus 第 6 周之后、Paimon 之前，独立投入 4 周：原主线第 1–6 周 → 本专题 M1–M4（连续日历第 7–10 周）→ 原主线第 7–17 周。按原 17 周排期计，串行学习约 21 周；后续 Paimon、Flink、Spark 的阶段编号保持不变，日历安排顺延 4 周。
+
+如果当前主要需求是补建模知识，也可以现在单独开始 M1–M3，M4 的 Datus 对照在具备运行环境后补做。M1–M3 只需要 SQL 基础、Git 和 Python 环境，不要求先读懂 Agent 或分布式引擎。
+
+已有每周额外 6 小时预算时才考虑并行；不要用原主线同一份时间预算同时承诺两个计划。并行模式保留原 17 周排期，专题每周仍需完成相同验收。
+
+## 2. 每周固定节奏
+
+- 第一次 1.5 小时：阅读一组概念或规范，先独立回答本周问题。
+- 第二次 1.5 小时：画图、编写模型或 SQL，保留设计取舍。
+- 第三次 2 小时：用边界样例对账，记录失败原因和修正。
+- 周末 1 小时：闭卷复述、整理笔记、更新进度；AI 用于质疑和核对，不代替验收。
+
+## 3. 四周计划与验收
+
+| 周 | 主题 | 本周任务 | 必须交付 | 验收门槛 |
+| --- | --- | --- | --- | --- |
+| M1 | 业务与逻辑建模 | 画订单到退款的流程；区分实体和事件；定义 6 类对象的粒度、主键和关系；写指标合同初稿 | 业务关系图、术语/粒度表、指标合同 | 能解释一订单多支付多退款；指出直接关联的重复计数风险 |
+| M2 | 维度建模与 SQL 验证 | 设计支付/退款事务事实、每日快照与履约累积快照草图；设计一致性客户/日期维；实现最小数据与对账 SQL | 星型模型、事实/维度清单、造数 SQL、指标断言 | 基础案例金额和订单数完全匹配；能解释 SCD2 区间、余额不可跨日相加、比率不能直接平均 |
+| M3 | Ossie 规范与模型表达 | 锁版本；读 spec、Schema、TPC-DS；把已验证模型写成 YAML；追验证入口到名称/引用检查 | Ossie YAML、验证记录、概念映射表、验证链路笔记 | 官方样例与自建模型均通过校验；删字段或制造错误引用会失败；明确校验不能证明什么 |
+| M4 | 工具互通与 AI 上下文 | 选一个转换器做往返对比；为同一数据源准备两种上下文；用固定问题集比较 SQL/结果 | 转换差异报告、10 题问答评估、总结与工作迁移建议 | 逐项记录保留/改写/丢失；10 题全部有正确答案和评估记录，错误有归因 |
+
+产出放在 `04-笔记/数据建模与Ossie/`，由学习者按进度创建。这里只制定计划，不把未运行的练习标成“已验证”。建议结构：
+
+```text
+04-笔记/数据建模与Ossie/
+├── 01-业务与粒度.md
+├── 02-维度模型与指标合同.md
+├── 03-Ossie规范与验证链路.md
+├── 04-转换与AI上下文评估.md
+├── 实验/
+│   ├── 建表与样例.sql
+│   ├── 指标与断言.sql
+│   ├── 订单支付退款.semantic.yaml
+│   └── 评估题集.md
+└── 总结.md
+```
+
+说明：最终学习成果放在上述笔记目录；克隆的上游仓库、依赖环境、缓存、临时转换文件和调用记录统一放在 `D:\hy\codex\ai-source-learning\ossie-study` 下的分类子目录。
+
+## 4. M1：明确业务边界和指标合同
+
+1. 选择订单、订单明细、支付事件、退款事件、客户、商品；逐个写“一行代表什么”，不能只列字段。
+2. 对每个关系写出两端是否唯一、是否允许缺失、会不会增加行数。
+3. 完成至少 5 个指标合同：成功支付金额、成功退款金额、净支付金额、成功支付订单数、每成功支付订单净额。模板见知识框架。
+4. 写清订单批次、截止时点、支付/退款事件日期、时区、状态、去重键和零分母策略。
+5. 讨论商品维度：支付只有订单级金额时，不能直接声称可按商品分析；需要先定义并验证分摊规则。
+
+闭卷问题：订单金额、支付金额、净支付金额何时不同？支付事实的主键为什么通常不是 order_id？“客户”与“客户的某个历史版本”有什么区别？
+
+## 5. M2：最小案例、标准答案与边界验证
+
+基础案例全部金额单位为元、统一用 DECIMAL；时区 Asia/Shanghai。订单 A/B/C 均在 2026-10-01 创建，订单批次取当天；截止时点是 2026-10-03 00:00:00（不含）。只纳入成功支付和成功退款，所有事件均有独立 ID。
+
+| 订单 | 订单状态 | 10 月 1 日成功支付 | 10 月 2 日成功退款 |
+| --- | --- | --- | --- |
+| A | 已支付 | P1=60，P2=40 | R1=10，R2=20 |
+| B | 已支付 | P3=50 | 无 |
+| C | 已取消 | 无 | 无 |
+
+标准答案：截至截止时点，成功支付金额 150，成功退款金额 30，净支付金额 120，成功支付订单数 2，每成功支付订单净额 60。退款金额率 30/150=20%；有退款的已支付订单占比 1/2=50%，两者不能混用。
+
+对比错误路径：A 的 2 条支付关联 2 条退款产生 4 行，支付被算成 200、退款被算成 60。正确路径是按订单分别汇总支付与退款后再关联；保留订单 B，退款额补 0。C 不进入成功支付订单数的分母。
+
+时间口径对比：按事件日计算现金流净额，10 月 1 日为 150，10 月 2 日为 -30；截至截止时点的订单批次净额为 120。不要把跨日退款直接改写成原支付日退款而不说明回溯规则。
+
+在基础案例通过后，每次只改变一个条件，至少完成下面 8 项并用查询结果断言：
+
+- 重复支付回调：同一事件 ID 重放后金额不变。
+- 失败支付：有金额但状态失败，不纳入成功支付金额。
+- 无退款订单：左关联后仍保留，退款为 0。
+- 截止时点边界：等于截止时点的事件排除，之前的纳入。
+- 零分母：没有成功支付订单时约定返回 NULL，而不是报错。
+- 迟到退款：区分事件时间和入仓时间，说明何时重算历史结果。
+- 客户 SCD2：有效期采用左闭右开；边界上的交易只能匹配一个版本。
+- 不同组大小下的比率汇总：重新汇总分子/分母，与直接平均比率对比。
+
+每个断言写明输入变化、预期值、实际值和结论。先在 SQLite（金额用整数分）或本地 DuckDB（DECIMAL）中选一个执行，不引入湖仓集群作为前置条件。三类事实表先完成设计比较，只实现支付/退款事务事实和指标所需最小视图即可。
+
+## 6. M3：从规范到可校验模型
+
+阅读顺序：
+
+1. `README.md`：项目边界与模型交换目标。
+2. `core-spec/spec.md`：datasets → fields → relationships → metrics → 名称解析。
+3. `core-spec/ossie-schema.json`：必填项、类型、嵌套结构。
+4. `examples/tpcds_semantic_model.yaml`：抽取一个销售事实和客户/商品/日期维度，逐项解释。
+5. `core-spec/relational_semantics.md`、`core-spec/expression_language.md`：关系与计算规则，不把格式声明当查询执行承诺。
+6. `validation/validate.py` 与相应测试：追 `main → validate_file → validate_document`，再按该 commit 实际调用定位检查函数，记录文件与行号。
+
+环境准备：核心验证脚本声明 Python >=3.11；在独立实验虚拟环境中按脚本声明安装 pyyaml、jsonschema、sqlglot，记录实际解析后的依赖版本。完整环境和运行日志放在 scratch 根目录下，不写入上游源码目录。
+
+```powershell
+# 当前目录为锁定 commit 的 Ossie checkout；$studyPython 为实验虚拟环境的 python 路径
+& $studyPython validation/validate.py examples/tpcds_semantic_model.yaml
+& $studyPython validation/validate.py 'D:\hy\读书笔记\AI读源码\04-笔记\数据建模与Ossie\实验\订单支付退款.semantic.yaml'
+```
+
+需要负向验证：错误类型、重复名字、字段引用不存在等案例能被检测；“数据中的重复支付事件”则由 M2 的 SQL 检测，不交给 Schema 校验。
+
+实现提醒：该锁定版本的指标引用声明字段，不能直接引用其他指标。必要时先在 SQL 视图中形成经过验证的字段/公共粒度，再建立语义映射。模型中的 description 与 ai_context 必须来自已明确的合同。
+
+## 7. M4：转换与 AI 对照实验
+
+### 转换实验
+
+- 选择与你现有工具接近的一个转换器（优先 dbt；没有对应环境时选择能本地生成文件的转换路径，按其 README 确认方向与依赖）。
+- 转换器固定到版本锁定表的 commit，其 ossie 子模块保持该仓库记录的 commit。它与 M3 的核心版本不同，先比较 Schema；必要时显式迁移副本，保留迁移记录。
+- 正向导出、再导回，逐项比较主键、字段类型、表达式、关系、description、ai_context、custom_extensions。
+- 转换器不支持双向时，记录限制并增加一个支持所需方向的转换器，完成一次真实往返；不得用手工重写冒充往返。
+- 用同一份测试数据和指标合同验证转换后的结果；只有文件生成且未运行目标查询时，明确标为“结构验证，执行未验证”。
+
+### AI 上下文实验
+
+- A 组：只有相同数据源的表结构。
+- B 组：同一表结构，加已验证的业务定义、关系说明、指标口径、时间边界和同义词。
+- 固定模型版本、参数、数据快照、问题顺序与工具权限，每题运行 3 次，记录每次 SQL 与结果；先做 10 题 × 2 组 × 1 次定位问题，再补齐各 3 次，共 60 次。这个小样本只用于学习诊断。
+- 10 题至少覆盖：支付总额、退款总额、净支付、成功支付订单数、每订单净额、退款金额率、订单退款占比、跨日退款、商品分摊歧义、客户历史属性。
+- 按结果数值、过滤状态、时间口径、关联粒度、无法回答时是否澄清逐项评分，比较通过率和重复运行的一致性，不以 SQL 看起来合理作为正确标准。
+- 优先使用锁定的 Datus；先核对是否有 Ossie 原生接入。没有则将模型整理成其支持的上下文格式，记录适配路径；Ossie 不是模型执行引擎，也不保证能被任意 Agent 自动读取。
+
+## 8. 完成标准与缩减方案
+
+- 能闭卷画出“业务过程 → 事实与维度 → 指标 → Ossie → BI/AI”的链路，并解释各层职责。
+- 至少 5 个指标合同完整，基础案例及 8 项边界 SQL 验证通过。
+- 至少一份自建模型通过锁定版本校验，负向案例有效；验证记录附命令、版本、日期和结果。
+- 有一次真实模型往返的差异报告；未执行验证的部分有明确状态。
+- 有 10 题的 AI 对照记录和错误归因，能提出至少一个可迁移到工作的改进建议。
+- 笔记中的规范结论有锁定源码位置；未运行部分标记“待验证”，完成后再更新 `04-笔记/README.md`。
+
+时间不足时先做 M1–M3 的 3 周最小版，M4 明确保留待办；保留粒度、指标合同和 SQL 对账，暂缓多种转换器、ontology 专题和 SDK 深挖。Ossie 全仓通读不作为完成条件。
+
+## 9. 官方资料
+
+- [核心规范（固定提交）](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/core-spec/spec.md)
+- [TPC-DS 示例（固定提交）](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/examples/tpcds_semantic_model.yaml)
+- [验证脚本（固定提交）](https://github.com/apache/ossie/blob/a498fce5455dcc209605cdbb30b21e47068ff15e/validation/validate.py)
+- [转换器仓库（固定提交）](https://github.com/apache/ossie-converters/tree/bc4eb5d051dcc1825d90aea7f0c2c4cf89015d3c)
+- [Kimball 维度建模技术目录](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/)
+</script>
+
 <script type="text/markdown" data-path="03-问题清单/工作问题backlog.md" data-title="工作问题 backlog" data-weeks="">
 # 工作问题 backlog
 
@@ -1692,6 +1997,19 @@ SparkCatalog / SparkSession → Table(SparkTable)
 - 想搞清楚：可复用的模块（context、工具层、校验重试），不可复用的部分（绑定的存储/UI）
 - 状态：待读
 
+## 建模专题的候选问题（尚未确认为工作问题）
+
+以下是学习检查项，与真实工作待办分开。遇到对应线上现象、需求或评审争议后，按卡片格式填写来源，再移入待办，不提前标记为已解决。
+
+- 同一个“净支付金额”在不同报表或 Agent 中定义不同，差异来自状态、截止时点还是退款归属？
+- 订单同时关联多条支付和退款后，金额为何翻倍？该在什么粒度分别聚合？
+- 客户地区或商品类目发生变化后，历史报表应按交易时属性还是当前属性计算？
+- 只有订单级支付金额，按商品统计时缺少什么分摊依据？AI 是否会主动澄清？
+- Ossie 模型通过校验后，为什么仍可能算错指标？哪些检查属于数据质量和结果对账？
+- 模型跨工具转换后，哪些指标定义、同义词或 AI 上下文发生了变化？
+
+执行计划见 [数据建模与 Ossie 学习路线](../02-路线图/05-数据建模与Ossie学习路线.md)，知识框架见 [方法论](../01-方法论/数据建模与语义建模知识框架.md)。
+
 ## 已解决
 
 （解决后把卡片移到这里，保留结论，方便以后回看。）
@@ -1713,6 +2031,8 @@ SparkCatalog / SparkSession → Table(SparkTable)
 - `spark-sql生命周期.md`
 - `对比-paimon-snapshot-vs-flink-checkpoint.md`
 
+建模专题集中在 `数据建模与Ossie/`，按 [4 周学习计划](../02-路线图/05-数据建模与Ossie学习路线.md) 创建业务粒度、维度与指标、规范验证、转换与 AI 评估笔记及实验文件；尚未执行的练习保留“待验证”。
+
 每篇都用 `01-方法论/笔记模板.md`，写完跑一遍提示词 P9 再标「已验证」。
 
 进度看这里（每写完一篇更新一次）：
@@ -1724,6 +2044,7 @@ SparkCatalog / SparkSession → Table(SparkTable)
 | Paimon | | |
 | Flink | | |
 | Spark | | |
+| 数据建模 / Ossie | [学习计划](../02-路线图/05-数据建模与Ossie学习路线.md) | 已规划，学习待开始 |
 </script>
 
 <!--DOCS-->
